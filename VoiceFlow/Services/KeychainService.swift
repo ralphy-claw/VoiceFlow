@@ -20,6 +20,7 @@ enum KeychainService {
     }
     
     private static let serviceName = "com.voiceflow.apikeys"
+    private static let accessGroup = "79NK8S894T.com.lubodev.voiceflow.shared"
     
     static func save(key: String, value: String) throws {
         guard let data = value.data(using: .utf8) else { return }
@@ -28,7 +29,8 @@ enum KeychainService {
         let deleteQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: serviceName,
-            kSecAttrAccount as String: key
+            kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup
         ]
         SecItemDelete(deleteQuery as CFDictionary)
         
@@ -37,7 +39,8 @@ enum KeychainService {
             kSecAttrService as String: serviceName,
             kSecAttrAccount as String: key,
             kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            kSecAttrAccessGroup as String: accessGroup,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
         ]
         
         let status = SecItemAdd(addQuery as CFDictionary, nil)
@@ -49,6 +52,7 @@ enum KeychainService {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: serviceName,
             kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup,
             kSecReturnData as String: true,
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
@@ -68,7 +72,8 @@ enum KeychainService {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: serviceName,
-            kSecAttrAccount as String: key
+            kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup
         ]
         
         let status = SecItemDelete(query as CFDictionary)
