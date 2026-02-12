@@ -30,3 +30,4 @@ Started: 2026-02-12
 - Dark theme with bitcoinOrange accent maintained throughout
 - Empty state "No history yet" shown when no records exist
 - Build succeeded on iPhone 17 Pro simulator
+Fri Feb 13 00:01:27 EET 2026: #5 - Keyboard extension target + App Group setup - DONE (e0f111d)
