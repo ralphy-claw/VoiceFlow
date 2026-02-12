@@ -1,0 +1,51 @@
+default_platform(:ios)
+
+platform :ios do
+
+  desc "Build and upload to TestFlight"
+  desc "Usage: fastlane beta"
+  lane :beta do |options|
+    build_number = (sh("git rev-list --count HEAD", log: false).strip.to_i + 100).to_s
+
+    gym(
+      scheme: "VoiceFlow",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "VoiceFlow.ipa",
+      clean: true
+    )
+
+    pilot(
+      app_identifier: "com.lubodev.voiceflow",
+      team_id: "79NK8S894T",
+      skip_waiting_for_build_processing: true,
+      distribute_external: false
+    )
+
+    UI.success("✅ VoiceFlow build #{build_number} uploaded to TestFlight!")
+  end
+
+  desc "Build without uploading (validation)"
+  desc "Usage: fastlane build"
+  lane :build do
+    gym(
+      scheme: "VoiceFlow",
+      configuration: "Release",
+      skip_archive: true,
+      skip_codesigning: true,
+      destination: "generic/platform=iOS Simulator"
+    )
+    UI.success("Build succeeded!")
+  end
+
+  desc "Run unit tests"
+  lane :tests do
+    scan(
+      scheme: "VoiceFlow",
+      device: "iPhone 16 Pro",
+      clean: true
+    )
+  end
+
+end

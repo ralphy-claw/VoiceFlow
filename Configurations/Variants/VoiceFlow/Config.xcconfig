@@ -1,0 +1,15 @@
+// Config.xcconfig - VoiceFlow Variant
+// Configuration for the VoiceFlow app
+
+// APP IDENTITY
+APP_DISPLAY_NAME = VoiceFlow
+BRAND_IDENTIFIER = VoiceFlow
+
+// CODE SIGNING
+DEVELOPMENT_TEAM = 79NK8S894T
+
+// BRAND CONFIGURATION (exposed to Swift via Info.plist → BrandConfiguration.swift)
+SUPPORT_EMAIL = support@voiceflow.app
+BRAND_NAME = VoiceFlow
+PREFERRED_COLOR_SCHEME = dark
+WEBSITE_BASE_URL = https:/$()/voiceflow.app

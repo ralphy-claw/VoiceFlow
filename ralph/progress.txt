@@ -32,3 +32,4 @@ Started: 2026-02-12
 - Build succeeded on iPhone 17 Pro simulator
 Fri Feb 13 00:01:27 EET 2026: #5 - Keyboard extension target + App Group setup - DONE (e0f111d)
 Fri Feb 13 00:02:17 EET 2026: #6 - Mic recording + Whisper transcription from keyboard - DONE (085b059)
+Fri Feb 13 00:03:06 EET 2026: #7 - Insert transcribed text into active text field - DONE (631e101)

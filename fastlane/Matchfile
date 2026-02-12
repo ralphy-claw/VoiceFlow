@@ -1,0 +1,14 @@
+# Matchfile - Fastlane Match Configuration
+
+username("lubo.dev@pm.me")
+
+git_url(ENV["MATCH_GIT_URL"] || "git@github.com:ralphy-claw/VoiceFlow.git")
+git_branch("certificates")
+
+storage_mode("git")
+
+app_identifier(["com.lubodev.voiceflow"])
+
+type("appstore")
+readonly(true)
+clone_branch_directly(true)

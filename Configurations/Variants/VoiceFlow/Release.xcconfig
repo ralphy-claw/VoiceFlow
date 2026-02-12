@@ -1,0 +1,8 @@
+// Release.xcconfig - VoiceFlow Variant (Release)
+// Combines base Release settings with VoiceFlow variant configuration
+
+#include "../../Base/Release.xcconfig"
+#include "Config.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = com.lubodev.voiceflow
+PRODUCT_NAME = VoiceFlow

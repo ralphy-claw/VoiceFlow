@@ -1,0 +1,14 @@
+// Debug.xcconfig
+// Debug-specific settings for all variants
+
+#include "Base.xcconfig"
+
+DEBUG_INFORMATION_FORMAT = dwarf
+SWIFT_OPTIMIZATION_LEVEL = -Onone
+ENABLE_TESTABILITY = YES
+
+GCC_PREPROCESSOR_DEFINITIONS = DEBUG=1 $(inherited)
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG $(inherited)
+
+ENABLE_NS_ASSERTIONS = YES
+ONLY_ACTIVE_ARCH = YES

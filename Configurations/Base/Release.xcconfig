@@ -1,0 +1,13 @@
+// Release.xcconfig
+// Release-specific settings for all variants
+
+#include "Base.xcconfig"
+
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+SWIFT_OPTIMIZATION_LEVEL = -O
+VALIDATE_PRODUCT = YES
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited)
+
+ENABLE_NS_ASSERTIONS = NO
+ONLY_ACTIVE_ARCH = NO

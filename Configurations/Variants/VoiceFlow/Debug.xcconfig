@@ -1,0 +1,8 @@
+// Debug.xcconfig - VoiceFlow Variant (Debug)
+// Combines base Debug settings with VoiceFlow variant configuration
+
+#include "../../Base/Debug.xcconfig"
+#include "Config.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = com.lubodev.voiceflow
+PRODUCT_NAME = VoiceFlow
