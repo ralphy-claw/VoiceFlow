@@ -19,3 +19,14 @@ Started: 2026-02-12
 - Added model files to Xcode project (pbxproj)
 - Build succeeded (iPhone 17 Pro simulator)
 - Committed: 0944f98
+
+## Issue #3 - Add history UI to all three tabs
+- Commit: 11334cb
+- Added @Query with descending timestamp sort to all three tab views
+- TranscribeView: history section with expandable rows showing source icon, text preview, timestamp; tap to expand with full text + copy; swipe to delete
+- SpeakView: history section with voice badge, expandable rows with replay audio from saved file + copy text; swipe to delete also removes stored audio file
+- SummarizeView: history section with expandable rows showing original text + summary with separate copy buttons; swipe to delete
+- All views converted from VStack to List with sections (controls on top, history below)
+- Dark theme with bitcoinOrange accent maintained throughout
+- Empty state "No history yet" shown when no records exist
+- Build succeeded on iPhone 17 Pro simulator

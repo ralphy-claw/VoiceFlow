@@ -1,8 +1,10 @@
 import Foundation
 
 enum Config {
-    // MARK: - Replace with your OpenAI API key
-    static let openAIAPIKey = "sk-YOUR-API-KEY-HERE"
+    // MARK: - API Key (reads from Keychain)
+    static var openAIAPIKey: String {
+        KeychainService.read(key: "openai-api-key") ?? ""
+    }
     
     // MARK: - API Endpoints
     static let whisperEndpoint = "https://api.openai.com/v1/audio/transcriptions"
