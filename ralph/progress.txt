@@ -1,0 +1,11 @@
+# Ralph Progress Log — VoiceFlow
+Started: 2026-02-12
+
+## Codebase Patterns
+- SwiftUI tab-based app with 3 tabs: Transcribe, Speak, Summarize
+- OpenAIService is an actor for thread-safe API calls
+- Config.swift holds API key (to be migrated to Keychain)
+- Uses AVFoundation for audio recording/playback
+- iOS 17+ target, modern Swift concurrency throughout
+
+---

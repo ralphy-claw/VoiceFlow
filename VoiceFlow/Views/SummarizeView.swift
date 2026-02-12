@@ -10,25 +10,25 @@ struct SummarizeView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                // Input
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Text to summarize")
                         .font(.headline)
                     
                     TextEditor(text: $inputText)
                         .frame(minHeight: 120)
+                        .scrollContentBackground(.hidden)
                         .padding(8)
-                        .background(Color(.systemGray6))
+                        .background(Color.darkSurface)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 .padding(.horizontal)
                 
-                // Summarize button
                 Button {
                     summarize()
                 } label: {
                     if isSummarizing {
                         ProgressView()
+                            .tint(.white)
                             .frame(maxWidth: .infinity)
                     } else {
                         Label("Summarize", systemImage: "sparkles")
@@ -36,10 +36,10 @@ struct SummarizeView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(.bitcoinOrange)
                 .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSummarizing)
                 .padding(.horizontal)
                 
-                // Summary result
                 if !summary.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
@@ -52,12 +52,13 @@ struct SummarizeView: View {
                                 Label("Copy", systemImage: "doc.on.doc")
                                     .font(.caption)
                             }
+                            .tint(.bitcoinOrange)
                         }
                         
                         Text(summary)
                             .padding(12)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(.systemGray6))
+                            .background(Color.darkSurface)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .padding(.horizontal)
@@ -66,6 +67,7 @@ struct SummarizeView: View {
                 Spacer()
             }
             .padding(.top)
+            .background(Color.darkBackground.ignoresSafeArea())
             .navigationTitle("Summarize")
             .alert("Error", isPresented: $showError) {
                 Button("OK") {}
@@ -92,4 +94,5 @@ struct SummarizeView: View {
 
 #Preview {
     SummarizeView()
+        .preferredColorScheme(.dark)
 }

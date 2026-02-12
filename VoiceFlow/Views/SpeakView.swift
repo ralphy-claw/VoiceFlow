@@ -14,20 +14,19 @@ struct SpeakView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                // Text input
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Text to speak")
                         .font(.headline)
                     
                     TextEditor(text: $inputText)
                         .frame(minHeight: 150)
+                        .scrollContentBackground(.hidden)
                         .padding(8)
-                        .background(Color(.systemGray6))
+                        .background(Color.darkSurface)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 .padding(.horizontal)
                 
-                // Voice picker
                 Picker("Voice", selection: $selectedVoice) {
                     ForEach(voices, id: \.self) { voice in
                         Text(voice.capitalized).tag(voice)
@@ -36,12 +35,12 @@ struct SpeakView: View {
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
                 
-                // Generate button
                 Button {
                     generateSpeech()
                 } label: {
                     if isGenerating {
                         ProgressView()
+                            .tint(.white)
                             .frame(maxWidth: .infinity)
                     } else {
                         Label("Generate Speech", systemImage: "waveform")
@@ -49,10 +48,10 @@ struct SpeakView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(.bitcoinOrange)
                 .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isGenerating)
                 .padding(.horizontal)
                 
-                // Playback controls
                 if audioData != nil {
                     Button {
                         togglePlayback()
@@ -60,11 +59,13 @@ struct SpeakView: View {
                         Label(player.isPlaying ? "Stop" : "Play", systemImage: player.isPlaying ? "stop.fill" : "play.fill")
                             .font(.title2)
                     }
+                    .tint(.bitcoinOrange)
                 }
                 
                 Spacer()
             }
             .padding(.top)
+            .background(Color.darkBackground.ignoresSafeArea())
             .navigationTitle("Speak")
             .alert("Error", isPresented: $showError) {
                 Button("OK") {}
@@ -101,4 +102,5 @@ struct SpeakView: View {
 
 #Preview {
     SpeakView()
+        .preferredColorScheme(.dark)
 }

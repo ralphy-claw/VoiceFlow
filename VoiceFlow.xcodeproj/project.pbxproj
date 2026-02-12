@@ -17,6 +17,7 @@
 		A10008 /* SpeakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10008; };
 		A10009 /* SummarizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10009; };
 		A10010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10010; };
+		611A8DCE398675FA07A0131A /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8DAEE71E8924F07B57DEB80 /* Theme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		B10009 /* SummarizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummarizeView.swift; sourceTree = "<group>"; };
 		B10010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		P10001 /* VoiceFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A8DAEE71E8924F07B57DEB80 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +63,8 @@
 				G10003 /* Services */,
 				G10004 /* Views */,
 				B10010 /* Assets.xcassets */,
-			);
+			
+				A8DAEE71E8924F07B57DEB80 /* Theme.swift */,);
 			path = VoiceFlow;
 			sourceTree = "<group>";
 		};
@@ -171,7 +174,8 @@
 				A10007 /* TranscribeView.swift in Sources */,
 				A10008 /* SpeakView.swift in Sources */,
 				A10009 /* SummarizeView.swift in Sources */,
-			);
+			
+				611A8DCE398675FA07A0131A /* Theme.swift in Sources */,);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

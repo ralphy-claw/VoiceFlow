@@ -18,10 +18,11 @@ struct ContentView: View {
                     Label("Summarize", systemImage: "doc.text.fill")
                 }
         }
-        .tint(.blue)
+        .tint(.bitcoinOrange)
     }
 }
 
 #Preview {
     ContentView()
+        .preferredColorScheme(.dark)
 }

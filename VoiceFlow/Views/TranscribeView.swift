@@ -14,29 +14,29 @@ struct TranscribeView: View {
             VStack(spacing: 20) {
                 // Recording controls
                 HStack(spacing: 30) {
-                    // Record button
                     Button {
                         handleRecord()
                     } label: {
                         VStack {
                             Image(systemName: recorder.isRecording ? "stop.circle.fill" : "mic.circle.fill")
                                 .font(.system(size: 60))
-                                .foregroundStyle(recorder.isRecording ? .red : .blue)
+                                .foregroundStyle(recorder.isRecording ? Color.red : Color.bitcoinOrange)
                             Text(recorder.isRecording ? "Stop" : "Record")
                                 .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     
-                    // Import button
                     Button {
                         showFilePicker = true
                     } label: {
                         VStack {
                             Image(systemName: "doc.badge.plus")
                                 .font(.system(size: 50))
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Color.bitcoinOrange)
                             Text("Import")
                                 .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .disabled(isTranscribing)
@@ -46,14 +46,14 @@ struct TranscribeView: View {
                 if recorder.isRecording {
                     Text(String(format: "%.1fs", recorder.recordingTime))
                         .font(.title2.monospacedDigit())
-                        .foregroundStyle(.red)
+                        .foregroundStyle(Color.bitcoinOrange)
                 }
                 
                 if isTranscribing {
                     ProgressView("Transcribing...")
+                        .tint(.bitcoinOrange)
                 }
                 
-                // Transcription result
                 if !transcription.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
@@ -66,12 +66,14 @@ struct TranscribeView: View {
                                 Label("Copy", systemImage: "doc.on.doc")
                                     .font(.caption)
                             }
+                            .tint(.bitcoinOrange)
                         }
                         
                         TextEditor(text: $transcription)
                             .frame(minHeight: 150)
+                            .scrollContentBackground(.hidden)
                             .padding(8)
-                            .background(Color(.systemGray6))
+                            .background(Color.darkSurface)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .padding(.horizontal)
@@ -79,6 +81,7 @@ struct TranscribeView: View {
                 
                 Spacer()
             }
+            .background(Color.darkBackground.ignoresSafeArea())
             .navigationTitle("Transcribe")
             .alert("Error", isPresented: $showError) {
                 Button("OK") {}
@@ -140,4 +143,5 @@ struct TranscribeView: View {
 
 #Preview {
     TranscribeView()
+        .preferredColorScheme(.dark)
 }
