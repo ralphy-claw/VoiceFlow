@@ -10,3 +10,12 @@ Started: 2026-02-12
 
 ---
 2026-02-12 23:25 - Issue #1: Dark theme with Bitcoin orange accents - DONE (commit 1477b7d)
+
+## Issue #2 - Add local history persistence with SwiftData
+- Created SwiftData @Model classes: TranscriptionRecord, TTSRecord, SummaryRecord in VoiceFlow/Models/
+- Configured ModelContainer in VoiceFlowApp.swift for all 3 model types
+- Updated TranscribeView, SpeakView, SummarizeView to save records after each operation
+- TTS audio files saved to app's documents directory
+- Added model files to Xcode project (pbxproj)
+- Build succeeded (iPhone 17 Pro simulator)
+- Committed: 0944f98

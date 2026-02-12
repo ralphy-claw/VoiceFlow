@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 
 struct TranscribeView: View {
     @Environment(\.modelContext) private var modelContext
+    @Query(sort: \TranscriptionRecord.timestamp, order: .reverse) private var history: [TranscriptionRecord]
     @StateObject private var recorder = AudioRecorder()
     @State private var transcription = ""
     @State private var isTranscribing = false
@@ -11,79 +12,109 @@ struct TranscribeView: View {
     @State private var showError = false
     @State private var showFilePicker = false
     @State private var lastSourceType = "recording"
+    @State private var expandedRecordID: UUID?
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                // Recording controls
-                HStack(spacing: 30) {
-                    Button {
-                        handleRecord()
-                    } label: {
-                        VStack {
-                            Image(systemName: recorder.isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                                .font(.system(size: 60))
-                                .foregroundStyle(recorder.isRecording ? Color.red : Color.bitcoinOrange)
-                            Text(recorder.isRecording ? "Stop" : "Record")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    
-                    Button {
-                        showFilePicker = true
-                    } label: {
-                        VStack {
-                            Image(systemName: "doc.badge.plus")
-                                .font(.system(size: 50))
-                                .foregroundStyle(Color.bitcoinOrange)
-                            Text("Import")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .disabled(isTranscribing)
-                }
-                .padding(.top)
-                
-                if recorder.isRecording {
-                    Text(String(format: "%.1fs", recorder.recordingTime))
-                        .font(.title2.monospacedDigit())
-                        .foregroundStyle(Color.bitcoinOrange)
-                }
-                
-                if isTranscribing {
-                    ProgressView("Transcribing...")
-                        .tint(.bitcoinOrange)
-                }
-                
-                if !transcription.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Transcription")
-                                .font(.headline)
-                            Spacer()
+            List {
+                // MARK: - Controls Section
+                Section {
+                    VStack(spacing: 16) {
+                        HStack(spacing: 30) {
                             Button {
-                                UIPasteboard.general.string = transcription
+                                handleRecord()
                             } label: {
-                                Label("Copy", systemImage: "doc.on.doc")
-                                    .font(.caption)
+                                VStack {
+                                    Image(systemName: recorder.isRecording ? "stop.circle.fill" : "mic.circle.fill")
+                                        .font(.system(size: 60))
+                                        .foregroundStyle(recorder.isRecording ? Color.red : Color.bitcoinOrange)
+                                    Text(recorder.isRecording ? "Stop" : "Record")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
-                            .tint(.bitcoinOrange)
+                            .buttonStyle(.plain)
+                            
+                            Button {
+                                showFilePicker = true
+                            } label: {
+                                VStack {
+                                    Image(systemName: "doc.badge.plus")
+                                        .font(.system(size: 50))
+                                        .foregroundStyle(Color.bitcoinOrange)
+                                    Text("Import")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(isTranscribing)
+                        }
+                        .frame(maxWidth: .infinity)
+                        
+                        if recorder.isRecording {
+                            Text(String(format: "%.1fs", recorder.recordingTime))
+                                .font(.title2.monospacedDigit())
+                                .foregroundStyle(Color.bitcoinOrange)
                         }
                         
-                        TextEditor(text: $transcription)
-                            .frame(minHeight: 150)
-                            .scrollContentBackground(.hidden)
-                            .padding(8)
-                            .background(Color.darkSurface)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        if isTranscribing {
+                            ProgressView("Transcribing...")
+                                .tint(.bitcoinOrange)
+                        }
+                        
+                        if !transcription.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text("Transcription")
+                                        .font(.headline)
+                                    Spacer()
+                                    Button {
+                                        UIPasteboard.general.string = transcription
+                                    } label: {
+                                        Label("Copy", systemImage: "doc.on.doc")
+                                            .font(.caption)
+                                    }
+                                    .tint(.bitcoinOrange)
+                                }
+                                
+                                Text(transcription)
+                                    .padding(8)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(Color.darkSurfaceLight)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
+                        }
                     }
-                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    .listRowBackground(Color.darkSurface)
                 }
                 
-                Spacer()
+                // MARK: - History Section
+                Section {
+                    if history.isEmpty {
+                        Text("No history yet")
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity)
+                            .listRowBackground(Color.darkSurface)
+                    } else {
+                        ForEach(history) { record in
+                            TranscriptionHistoryRow(record: record, isExpanded: expandedRecordID == record.id)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    withAnimation {
+                                        expandedRecordID = expandedRecordID == record.id ? nil : record.id
+                                    }
+                                }
+                                .listRowBackground(Color.darkSurface)
+                        }
+                        .onDelete(perform: deleteRecords)
+                    }
+                } header: {
+                    Text("History")
+                }
             }
+            .scrollContentBackground(.hidden)
             .background(Color.darkBackground.ignoresSafeArea())
             .navigationTitle("Transcribe")
             .alert("Error", isPresented: $showError) {
@@ -95,6 +126,13 @@ struct TranscribeView: View {
                 handleFileImport(result)
             }
         }
+    }
+    
+    private func deleteRecords(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(history[index])
+        }
+        try? modelContext.save()
     }
     
     private func handleRecord() {
@@ -145,6 +183,46 @@ struct TranscribeView: View {
             }
             isTranscribing = false
         }
+    }
+}
+
+// MARK: - History Row
+
+private struct TranscriptionHistoryRow: View {
+    let record: TranscriptionRecord
+    let isExpanded: Bool
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: record.sourceType == "recording" ? "mic.fill" : "doc.fill")
+                    .foregroundStyle(Color.bitcoinOrange)
+                    .font(.caption)
+                Text(record.transcribedText)
+                    .lineLimit(isExpanded ? nil : 2)
+                Spacer()
+            }
+            
+            Text(record.timestamp, style: .relative)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            
+            if isExpanded {
+                Divider()
+                Text(record.transcribedText)
+                    .font(.body)
+                    .textSelection(.enabled)
+                
+                Button {
+                    UIPasteboard.general.string = record.transcribedText
+                } label: {
+                    Label("Copy", systemImage: "doc.on.doc")
+                        .font(.caption)
+                }
+                .tint(.bitcoinOrange)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 
