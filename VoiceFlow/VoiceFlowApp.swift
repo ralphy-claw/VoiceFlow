@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct VoiceFlowApp: App {
@@ -7,5 +8,10 @@ struct VoiceFlowApp: App {
             ContentView()
                 .preferredColorScheme(.dark)
         }
+        .modelContainer(for: [
+            TranscriptionRecord.self,
+            TTSRecord.self,
+            SummaryRecord.self
+        ])
     }
 }

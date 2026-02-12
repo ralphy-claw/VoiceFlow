@@ -1,6 +1,8 @@
 import SwiftUI
+import SwiftData
 
 struct SpeakView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var inputText = ""
     @State private var selectedVoice = "alloy"
     @State private var isGenerating = false
@@ -81,6 +83,14 @@ struct SpeakView: View {
             do {
                 let data = try await OpenAIService.shared.synthesize(text: inputText, voice: selectedVoice)
                 audioData = data
+                // Save TTS audio to documents directory
+                let filename = "\(UUID().uuidString).mp3"
+                let docsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                let fileURL = docsURL.appendingPathComponent(filename)
+                try? data.write(to: fileURL)
+                let record = TTSRecord(inputText: inputText, voiceUsed: selectedVoice, audioFilePath: filename)
+                modelContext.insert(record)
+                try? modelContext.save()
             } catch {
                 errorMessage = error.localizedDescription
                 showError = true

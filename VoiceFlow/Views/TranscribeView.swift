@@ -1,13 +1,16 @@
 import SwiftUI
+import SwiftData
 import UniformTypeIdentifiers
 
 struct TranscribeView: View {
+    @Environment(\.modelContext) private var modelContext
     @StateObject private var recorder = AudioRecorder()
     @State private var transcription = ""
     @State private var isTranscribing = false
     @State private var errorMessage: String?
     @State private var showError = false
     @State private var showFilePicker = false
+    @State private var lastSourceType = "recording"
     
     var body: some View {
         NavigationStack {
@@ -97,7 +100,8 @@ struct TranscribeView: View {
     private func handleRecord() {
         if recorder.isRecording {
             guard let url = recorder.stopRecording() else { return }
-            transcribeFile(at: url)
+            lastSourceType = "recording"
+            transcribeFile(at: url, sourceType: "recording", duration: recorder.recordingTime)
         } else {
             do {
                 try recorder.startRecording()
@@ -117,7 +121,7 @@ struct TranscribeView: View {
             if let data = try? Data(contentsOf: url) {
                 let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(url.lastPathComponent)
                 try? data.write(to: tempURL)
-                transcribeFile(at: tempURL)
+                transcribeFile(at: tempURL, sourceType: "import", duration: nil)
             }
         case .failure(let error):
             errorMessage = error.localizedDescription
@@ -125,13 +129,16 @@ struct TranscribeView: View {
         }
     }
     
-    private func transcribeFile(at url: URL) {
+    private func transcribeFile(at url: URL, sourceType: String, duration: Double?) {
         isTranscribing = true
         Task {
             do {
                 let data = try Data(contentsOf: url)
                 let text = try await OpenAIService.shared.transcribe(audioData: data, filename: url.lastPathComponent)
                 transcription = text
+                let record = TranscriptionRecord(sourceType: sourceType, transcribedText: text, duration: duration)
+                modelContext.insert(record)
+                try? modelContext.save()
             } catch {
                 errorMessage = error.localizedDescription
                 showError = true

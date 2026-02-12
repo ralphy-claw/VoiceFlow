@@ -9,3 +9,4 @@ Started: 2026-02-12
 - iOS 17+ target, modern Swift concurrency throughout
 
 ---
+2026-02-12 23:25 - Issue #1: Dark theme with Bitcoin orange accents - DONE (commit 1477b7d)

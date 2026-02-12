@@ -1,6 +1,8 @@
 import SwiftUI
+import SwiftData
 
 struct SummarizeView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var inputText = ""
     @State private var summary = ""
     @State private var isSummarizing = false
@@ -83,6 +85,9 @@ struct SummarizeView: View {
             do {
                 let result = try await OpenAIService.shared.summarize(text: inputText)
                 summary = result
+                let record = SummaryRecord(inputText: inputText, summaryText: result)
+                modelContext.insert(record)
+                try? modelContext.save()
             } catch {
                 errorMessage = error.localizedDescription
                 showError = true
