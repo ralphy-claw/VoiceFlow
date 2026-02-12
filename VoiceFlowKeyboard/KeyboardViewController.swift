@@ -7,15 +7,17 @@ class KeyboardViewController: UIInputViewController {
     private var isRecording = false
     private var audioRecorder: AVAudioRecorder?
     private var transcribedText: String = ""
-    private var errorMessage: String?
 
     // MARK: - UI Elements
     private let micButton = UIButton(type: .system)
     private let nextKeyboardButton = UIButton(type: .system)
-    private let previewLabel = UILabel()
+    private let previewTextView = UITextView()
     private let containerView = UIView()
     private let recordingIndicator = UIView()
     private let statusLabel = UILabel()
+    private let insertButton = UIButton(type: .system)
+    private let cancelButton = UIButton(type: .system)
+    private let actionStack = UIStackView()
 
     // MARK: - Theme
     private let bitcoinOrange = UIColor(red: 247/255, green: 147/255, blue: 26/255, alpha: 1)
@@ -43,17 +45,18 @@ class KeyboardViewController: UIInputViewController {
         containerView.backgroundColor = darkBackground
         view.addSubview(containerView)
 
-        // Preview area
-        previewLabel.translatesAutoresizingMaskIntoConstraints = false
-        previewLabel.text = "Tap mic to transcribe"
-        previewLabel.textColor = .lightGray
-        previewLabel.textAlignment = .center
-        previewLabel.font = .systemFont(ofSize: 14)
-        previewLabel.backgroundColor = darkSurface
-        previewLabel.layer.cornerRadius = 8
-        previewLabel.clipsToBounds = true
-        previewLabel.numberOfLines = 3
-        containerView.addSubview(previewLabel)
+        // Editable preview text view
+        previewTextView.translatesAutoresizingMaskIntoConstraints = false
+        previewTextView.text = "Tap mic to transcribe"
+        previewTextView.textColor = .lightGray
+        previewTextView.backgroundColor = darkSurface
+        previewTextView.layer.cornerRadius = 8
+        previewTextView.clipsToBounds = true
+        previewTextView.font = .systemFont(ofSize: 14)
+        previewTextView.isEditable = true
+        previewTextView.isScrollEnabled = true
+        previewTextView.textContainerInset = UIEdgeInsets(top: 8, left: 4, bottom: 8, right: 4)
+        containerView.addSubview(previewTextView)
 
         // Recording indicator (red dot)
         recordingIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -69,6 +72,32 @@ class KeyboardViewController: UIInputViewController {
         statusLabel.textAlignment = .center
         statusLabel.font = .systemFont(ofSize: 11)
         containerView.addSubview(statusLabel)
+
+        // Action buttons stack (Insert + Cancel)
+        actionStack.translatesAutoresizingMaskIntoConstraints = false
+        actionStack.axis = .horizontal
+        actionStack.spacing = 12
+        actionStack.distribution = .fillEqually
+        actionStack.isHidden = true
+        containerView.addSubview(actionStack)
+
+        // Insert button
+        insertButton.setTitle("Insert", for: .normal)
+        insertButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+        insertButton.setTitleColor(darkBackground, for: .normal)
+        insertButton.backgroundColor = bitcoinOrange
+        insertButton.layer.cornerRadius = 8
+        insertButton.addTarget(self, action: #selector(insertTapped), for: .touchUpInside)
+        actionStack.addArrangedSubview(insertButton)
+
+        // Cancel button
+        cancelButton.setTitle("Cancel", for: .normal)
+        cancelButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+        cancelButton.setTitleColor(.lightGray, for: .normal)
+        cancelButton.backgroundColor = darkSurface
+        cancelButton.layer.cornerRadius = 8
+        cancelButton.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
+        actionStack.addArrangedSubview(cancelButton)
 
         // Mic button
         micButton.translatesAutoresizingMaskIntoConstraints = false
@@ -92,23 +121,28 @@ class KeyboardViewController: UIInputViewController {
             containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             containerView.topAnchor.constraint(equalTo: view.topAnchor),
-            containerView.heightAnchor.constraint(equalToConstant: 180),
+            containerView.heightAnchor.constraint(equalToConstant: 220),
 
-            previewLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
-            previewLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
-            previewLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
-            previewLabel.heightAnchor.constraint(equalToConstant: 50),
+            previewTextView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
+            previewTextView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
+            previewTextView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
+            previewTextView.heightAnchor.constraint(equalToConstant: 56),
 
-            recordingIndicator.centerYAnchor.constraint(equalTo: previewLabel.centerYAnchor),
-            recordingIndicator.trailingAnchor.constraint(equalTo: previewLabel.trailingAnchor, constant: -8),
+            recordingIndicator.topAnchor.constraint(equalTo: previewTextView.topAnchor, constant: 8),
+            recordingIndicator.trailingAnchor.constraint(equalTo: previewTextView.trailingAnchor, constant: -8),
             recordingIndicator.widthAnchor.constraint(equalToConstant: 10),
             recordingIndicator.heightAnchor.constraint(equalToConstant: 10),
 
-            statusLabel.topAnchor.constraint(equalTo: previewLabel.bottomAnchor, constant: 4),
+            actionStack.topAnchor.constraint(equalTo: previewTextView.bottomAnchor, constant: 6),
+            actionStack.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
+            actionStack.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
+            actionStack.heightAnchor.constraint(equalToConstant: 32),
+
+            statusLabel.topAnchor.constraint(equalTo: actionStack.bottomAnchor, constant: 2),
             statusLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
 
             micButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            micButton.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 8),
+            micButton.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 6),
             micButton.widthAnchor.constraint(equalToConstant: 56),
             micButton.heightAnchor.constraint(equalToConstant: 56),
 
@@ -130,6 +164,28 @@ class KeyboardViewController: UIInputViewController {
         micButton.backgroundColor = bgColor
     }
 
+    // MARK: - Actions
+
+    @objc private func insertTapped() {
+        let text = previewTextView.text ?? ""
+        guard !text.isEmpty, text != "Tap mic to transcribe" else { return }
+        textDocumentProxy.insertText(text)
+        resetPreview()
+    }
+
+    @objc private func cancelTapped() {
+        resetPreview()
+    }
+
+    private func resetPreview() {
+        transcribedText = ""
+        previewTextView.text = "Tap mic to transcribe"
+        previewTextView.textColor = .lightGray
+        previewTextView.isEditable = false
+        actionStack.isHidden = true
+        statusLabel.text = ""
+    }
+
     // MARK: - Recording
 
     @objc private func micTapped() {
@@ -141,7 +197,6 @@ class KeyboardViewController: UIInputViewController {
     }
 
     private func startRecording() {
-        // Check API key
         guard !Config.openAIAPIKey.isEmpty else {
             showError("No API key. Set it in the VoiceFlow app.")
             return
@@ -169,8 +224,10 @@ class KeyboardViewController: UIInputViewController {
             isRecording = true
             updateMicButtonAppearance()
             recordingIndicator.isHidden = false
-            previewLabel.text = "Recording..."
-            previewLabel.textColor = .white
+            previewTextView.text = "Recording..."
+            previewTextView.textColor = .white
+            previewTextView.isEditable = false
+            actionStack.isHidden = true
             statusLabel.text = "Tap stop when done"
             startRecordingAnimation()
         } catch {
@@ -185,8 +242,8 @@ class KeyboardViewController: UIInputViewController {
         updateMicButtonAppearance()
         recordingIndicator.isHidden = true
         stopRecordingAnimation()
-        previewLabel.text = "Transcribing..."
-        previewLabel.textColor = bitcoinOrange
+        previewTextView.text = "Transcribing..."
+        previewTextView.textColor = bitcoinOrange
         statusLabel.text = ""
 
         transcribeAudio()
@@ -230,11 +287,9 @@ class KeyboardViewController: UIInputViewController {
         request.timeoutInterval = 30
 
         var body = Data()
-        // model
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"model\"\r\n\r\n".data(using: .utf8)!)
         body.append("\(Config.whisperModel)\r\n".data(using: .utf8)!)
-        // file
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"file\"; filename=\"audio.m4a\"\r\n".data(using: .utf8)!)
         body.append("Content-Type: audio/m4a\r\n\r\n".data(using: .utf8)!)
@@ -258,7 +313,6 @@ class KeyboardViewController: UIInputViewController {
                 }
 
                 if http.statusCode != 200 {
-                    let errBody = String(data: data, encoding: .utf8) ?? "Unknown"
                     self?.showError("API error (\(http.statusCode))")
                     return
                 }
@@ -269,10 +323,7 @@ class KeyboardViewController: UIInputViewController {
                     if text.isEmpty {
                         self?.showError("No speech detected")
                     } else {
-                        self?.transcribedText = text
-                        self?.previewLabel.text = text
-                        self?.previewLabel.textColor = .white
-                        self?.statusLabel.text = "Tap mic to record again"
+                        self?.showTranscription(text)
                     }
                 } catch {
                     self?.showError("Parse error")
@@ -281,11 +332,22 @@ class KeyboardViewController: UIInputViewController {
         }.resume()
     }
 
-    // MARK: - Error
+    // MARK: - Display
+
+    private func showTranscription(_ text: String) {
+        transcribedText = text
+        previewTextView.text = text
+        previewTextView.textColor = .white
+        previewTextView.isEditable = true
+        actionStack.isHidden = false
+        statusLabel.text = "Edit text, then Insert or Cancel"
+    }
 
     private func showError(_ message: String) {
-        previewLabel.text = message
-        previewLabel.textColor = .systemRed
+        previewTextView.text = message
+        previewTextView.textColor = .systemRed
+        previewTextView.isEditable = false
+        actionStack.isHidden = true
         statusLabel.text = "Tap mic to try again"
         transcribedText = ""
     }
