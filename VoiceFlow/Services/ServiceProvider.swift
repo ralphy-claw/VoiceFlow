@@ -19,7 +19,7 @@ protocol ServiceProvider: Identifiable {
 
 extension ServiceProvider {
     var apiKey: String? {
-        get { KeychainService.read(key: keychainKey) }
+        get { APIKeyHelper.readAPIKey(for: keychainKey) }
     }
     
     var hasKey: Bool { apiKey != nil && !(apiKey?.isEmpty ?? true) }
@@ -32,14 +32,8 @@ class OpenAIProvider: ServiceProvider, ObservableObject {
     let keychainKey = "openai-api-key"
     
     var apiKey: String? {
-        get { KeychainService.read(key: keychainKey) }
-        set {
-            if let value = newValue, !value.isEmpty {
-                try? KeychainService.save(key: keychainKey, value: value)
-            } else {
-                try? KeychainService.delete(key: keychainKey)
-            }
-        }
+        get { APIKeyHelper.readAPIKey(for: keychainKey) }
+        set { APIKeyHelper.saveAPIKey(newValue, for: keychainKey) }
     }
     
     func validate(apiKey: String) async -> Bool {

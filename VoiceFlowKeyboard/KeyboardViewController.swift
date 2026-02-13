@@ -18,22 +18,51 @@ class KeyboardViewController: UIInputViewController {
     private let insertButton = UIButton(type: .system)
     private let cancelButton = UIButton(type: .system)
     private let actionStack = UIStackView()
+    private let fullAccessBanner = UILabel()
 
     // MARK: - Theme
     private let bitcoinOrange = UIColor(red: 247/255, green: 147/255, blue: 26/255, alpha: 1)
     private let darkBackground = UIColor(red: 13/255, green: 13/255, blue: 13/255, alpha: 1)
     private let darkSurface = UIColor(red: 26/255, green: 26/255, blue: 30/255, alpha: 1)
 
+    // MARK: - App Group
+    private let appGroupID = "group.com.lubodev.voiceflow"
+    
     // MARK: - Audio
     private var audioFileURL: URL {
-        let dir = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.lubodev.voiceflow")
+        let dir = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID)
             ?? FileManager.default.temporaryDirectory
         return dir.appendingPathComponent("keyboard_recording.m4a")
+    }
+    
+    // MARK: - API Key Reading
+    private func readAPIKey() -> String? {
+        // Try Keychain first
+        if let keychainKey = KeychainService.read(key: "openai-api-key"), !keychainKey.isEmpty {
+            return keychainKey
+        }
+        // Fall back to App Group UserDefaults
+        if let defaults = UserDefaults(suiteName: appGroupID),
+           let key = defaults.string(forKey: "openai-api-key"), !key.isEmpty {
+            return key
+        }
+        return nil
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        checkFullAccess()
+    }
+    
+    private func checkFullAccess() {
+        if !hasFullAccess {
+            fullAccessBanner.isHidden = false
+            micButton.isEnabled = false
+        } else {
+            fullAccessBanner.isHidden = true
+            micButton.isEnabled = true
+        }
     }
 
     // MARK: - Setup
@@ -44,6 +73,19 @@ class KeyboardViewController: UIInputViewController {
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.backgroundColor = darkBackground
         view.addSubview(containerView)
+        
+        // Full access banner
+        fullAccessBanner.translatesAutoresizingMaskIntoConstraints = false
+        fullAccessBanner.text = "⚠️ Enable Full Access in Settings → Keyboards → VoiceFlow"
+        fullAccessBanner.textColor = bitcoinOrange
+        fullAccessBanner.textAlignment = .center
+        fullAccessBanner.font = .systemFont(ofSize: 12, weight: .medium)
+        fullAccessBanner.numberOfLines = 0
+        fullAccessBanner.backgroundColor = darkSurface
+        fullAccessBanner.layer.cornerRadius = 8
+        fullAccessBanner.clipsToBounds = true
+        fullAccessBanner.isHidden = true
+        containerView.addSubview(fullAccessBanner)
 
         // Editable preview text view
         previewTextView.translatesAutoresizingMaskIntoConstraints = false
@@ -122,8 +164,13 @@ class KeyboardViewController: UIInputViewController {
             containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             containerView.topAnchor.constraint(equalTo: view.topAnchor),
             containerView.heightAnchor.constraint(equalToConstant: 220),
+            
+            fullAccessBanner.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 4),
+            fullAccessBanner.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
+            fullAccessBanner.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
+            fullAccessBanner.heightAnchor.constraint(equalToConstant: 32),
 
-            previewTextView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
+            previewTextView.topAnchor.constraint(equalTo: fullAccessBanner.bottomAnchor, constant: 4),
             previewTextView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
             previewTextView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
             previewTextView.heightAnchor.constraint(equalToConstant: 56),
@@ -197,7 +244,7 @@ class KeyboardViewController: UIInputViewController {
     }
 
     private func startRecording() {
-        guard !Config.openAIAPIKey.isEmpty else {
+        guard let apiKey = readAPIKey(), !apiKey.isEmpty else {
             showError("No API key. Set it in the VoiceFlow app.")
             return
         }
@@ -273,8 +320,7 @@ class KeyboardViewController: UIInputViewController {
             return
         }
 
-        let apiKey = Config.openAIAPIKey
-        guard !apiKey.isEmpty else {
+        guard let apiKey = readAPIKey(), !apiKey.isEmpty else {
             showError("No API key configured")
             return
         }
