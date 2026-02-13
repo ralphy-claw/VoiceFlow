@@ -22,6 +22,7 @@ struct SpeakView: View {
     @State private var showCopyToast = false
     @State private var showPlaybackBar = false
     @StateObject private var playbackVM = AudioPlaybackViewModel()
+    @FocusState private var isInputFocused: Bool
     
     private let voices = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
     
@@ -59,6 +60,8 @@ struct SpeakView: View {
                                 .padding(8)
                                 .background(Color.darkSurfaceLight)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .focused($isInputFocused)
+                                .disabled(isGenerating)
                                 .contextMenu {
                                     if !inputText.isEmpty {
                                         Button {
@@ -223,6 +226,7 @@ struct SpeakView: View {
     }
     
     private func generateSpeech() {
+        isInputFocused = false
         HapticService.impact(.medium)
         isGenerating = true
         Task {
