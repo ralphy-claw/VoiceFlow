@@ -7,41 +7,54 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10001 /* VoiceFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10001; };
-		A10002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10002; };
-		A10003 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10003; };
-		A10004 /* OpenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10004; };
-		A10005 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10005; };
-		A10006 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10006; };
-		A10007 /* TranscribeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10007; };
-		A10008 /* SpeakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10008; };
-		A10009 /* SummarizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10009; };
-		A10010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10010; };
-		611A8DCE398675FA07A0131A /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8DAEE71E8924F07B57DEB80; };
-		A10011 /* TranscriptionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10011; };
-		A10012 /* TTSRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10012; };
-		A10013 /* SummaryRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10013; };
-		A10014 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10014; };
-		A10015 /* ServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10015; };
-		A10016 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10016; };
-		A20001 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20001; };
-		A20002 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10014; };
-		A20003 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10003; };
-		A20010 /* VoiceFlowKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = P20001; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		A10017 /* BrandConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10017; };
-		A10018 /* SharedDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10018; };
-		A10019 /* HapticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10019; };
-		A10020 /* ElevenLabsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10020; };
-		A10021 /* WhisperKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10021; };
-		A10022 /* SummarizeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10022; };
-		A10023 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10023; };
-		A10024 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B10024; };
+		075BC2C9A042D6A5A74ADE53 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F75E1C0CA857E8182EA87D /* Foundation.framework */; };
+		090D78AB659C19289EE49415 /* WhisperKitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1244BDDC17779F97A2EF4A11 /* WhisperKitServiceTests.swift */; };
+		16434A020173C05A4119FA8D /* SummarizeSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511BC2642ACBF24741B5D6BF /* SummarizeSettingsTests.swift */; };
+		611A8DCE398675FA07A0131A /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8DAEE71E8924F07B57DEB80 /* Theme.swift */; };
+		75FB3A37B0EE2579AB9BDF5D /* ElevenLabsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CAE18C001A2E488FA5C1D7 /* ElevenLabsServiceTests.swift */; };
+		A10001 /* VoiceFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10001 /* VoiceFlowApp.swift */; };
+		A10002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10002 /* ContentView.swift */; };
+		A10003 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10003 /* Config.swift */; };
+		A10004 /* OpenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10004 /* OpenAIService.swift */; };
+		A10005 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10005 /* AudioRecorder.swift */; };
+		A10006 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10006 /* AudioPlayer.swift */; };
+		A10007 /* TranscribeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10007 /* TranscribeView.swift */; };
+		A10008 /* SpeakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10008 /* SpeakView.swift */; };
+		A10009 /* SummarizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10009 /* SummarizeView.swift */; };
+		A10010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10010 /* Assets.xcassets */; };
+		A10011 /* TranscriptionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10011 /* TranscriptionRecord.swift */; };
+		A10012 /* TTSRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10012 /* TTSRecord.swift */; };
+		A10013 /* SummaryRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10013 /* SummaryRecord.swift */; };
+		A10014 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10014 /* KeychainService.swift */; };
+		A10015 /* ServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10015 /* ServiceProvider.swift */; };
+		A10016 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10016 /* SettingsView.swift */; };
+		A10017 /* BrandConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10017 /* BrandConfiguration.swift */; };
+		A10018 /* SharedDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10018 /* SharedDataHandler.swift */; };
+		A10019 /* HapticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10019 /* HapticService.swift */; };
+		A10020 /* ElevenLabsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10020 /* ElevenLabsService.swift */; };
+		A10021 /* WhisperKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10021 /* WhisperKitService.swift */; };
+		A10022 /* SummarizeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10022 /* SummarizeSettings.swift */; };
+		A10023 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10023 /* ToastView.swift */; };
+		A20001 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20001 /* KeyboardViewController.swift */; };
+		A20002 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10014 /* KeychainService.swift */; };
+		A20003 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10003 /* Config.swift */; };
+		A20010 /* VoiceFlowKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = P20001 /* VoiceFlowKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CDEAA6816C6EF65667D25B42 /* SharedDataHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEC83E9D6C19F9CF4790A2A /* SharedDataHandlerTests.swift */; };
+		D7A2E3AADC50C896F1997695 /* STTSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4A9E3B5A72CBC4BB12EC6B /* STTSettingsTests.swift */; };
+		A30001 /* AudioPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30001 /* AudioPlayerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		2F9106E0073E1585B1F17E32 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = PR1001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = T10001;
+			remoteInfo = VoiceFlow;
+		};
 		CIP2001 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = PR1001;
+			containerPortal = PR1001 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = T20001;
 			remoteInfo = VoiceFlowKeyboard;
@@ -63,6 +76,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1244BDDC17779F97A2EF4A11 /* WhisperKitServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WhisperKitServiceTests.swift; sourceTree = "<group>"; };
+		42F75E1C0CA857E8182EA87D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		511BC2642ACBF24741B5D6BF /* SummarizeSettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SummarizeSettingsTests.swift; sourceTree = "<group>"; };
+		665F6E1DAEAE1E1E675953AB /* VoiceFlowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceFlowTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BEC83E9D6C19F9CF4790A2A /* SharedDataHandlerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedDataHandlerTests.swift; sourceTree = "<group>"; };
+		97CAE18C001A2E488FA5C1D7 /* ElevenLabsServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ElevenLabsServiceTests.swift; sourceTree = "<group>"; };
+		A8DAEE71E8924F07B57DEB80 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		B10001 /* VoiceFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceFlowApp.swift; sourceTree = "<group>"; };
 		B10002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B10003 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
@@ -73,22 +93,13 @@
 		B10008 /* SpeakView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakView.swift; sourceTree = "<group>"; };
 		B10009 /* SummarizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummarizeView.swift; sourceTree = "<group>"; };
 		B10010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		P10001 /* VoiceFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A8DAEE71E8924F07B57DEB80 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		B10011 /* TranscriptionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionRecord.swift; sourceTree = "<group>"; };
 		B10012 /* TTSRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSRecord.swift; sourceTree = "<group>"; };
 		B10013 /* SummaryRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryRecord.swift; sourceTree = "<group>"; };
 		B10014 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		B10015 /* ServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProvider.swift; sourceTree = "<group>"; };
 		B10016 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		B20001 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
-		B20002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		P20001 /* VoiceFlowKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VoiceFlowKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		B20ENT /* VoiceFlowKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiceFlowKeyboard.entitlements; sourceTree = "<group>"; };
-		B10ENT /* VoiceFlow.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiceFlow.entitlements; sourceTree = "<group>"; };
 		B10017 /* BrandConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandConfiguration.swift; sourceTree = "<group>"; };
-		XCC001 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
-		XCC002 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		B10018 /* SharedDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDataHandler.swift; sourceTree = "<group>"; };
 		B10019 /* HapticService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticService.swift; sourceTree = "<group>"; };
 		B10020 /* ElevenLabsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsService.swift; sourceTree = "<group>"; };
@@ -96,9 +107,27 @@
 		B10022 /* SummarizeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummarizeSettings.swift; sourceTree = "<group>"; };
 		B10023 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		B10024 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B10ENT /* VoiceFlow.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiceFlow.entitlements; sourceTree = "<group>"; };
+		B20001 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
+		B20002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B20ENT /* VoiceFlowKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiceFlowKeyboard.entitlements; sourceTree = "<group>"; };
+		B30001 /* AudioPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerTests.swift; sourceTree = "<group>"; };
+		DF4A9E3B5A72CBC4BB12EC6B /* STTSettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = STTSettingsTests.swift; sourceTree = "<group>"; };
+		P10001 /* VoiceFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		P20001 /* VoiceFlowKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VoiceFlowKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		XCC001 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		XCC002 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		ED2BB87757914BB908242097 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				075BC2C9A042D6A5A74ADE53 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F10001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -116,6 +145,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5BCB1239D247448A9C0D5B29 /* VoiceFlowTests */ = {
+			isa = PBXGroup;
+			children = (
+				97CAE18C001A2E488FA5C1D7 /* ElevenLabsServiceTests.swift */,
+				DF4A9E3B5A72CBC4BB12EC6B /* STTSettingsTests.swift */,
+				6BEC83E9D6C19F9CF4790A2A /* SharedDataHandlerTests.swift */,
+				511BC2642ACBF24741B5D6BF /* SummarizeSettingsTests.swift */,
+				1244BDDC17779F97A2EF4A11 /* WhisperKitServiceTests.swift */,
+				B30001 /* AudioPlayerTests.swift */,
+			);
+			name = VoiceFlowTests;
+			path = VoiceFlowTests;
+			sourceTree = "<group>";
+		};
+		D58501F492767B557B97A45B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DD67DE216D1103DFC74FA8A5 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DD67DE216D1103DFC74FA8A5 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				42F75E1C0CA857E8182EA87D /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
 		G10001 = {
 			isa = PBXGroup;
 			children = (
@@ -123,6 +182,8 @@
 				G20001 /* VoiceFlowKeyboard */,
 				GCFG01 /* Configurations */,
 				G10005 /* Products */,
+				D58501F492767B557B97A45B /* Frameworks */,
+				5BCB1239D247448A9C0D5B29 /* VoiceFlowTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -144,24 +205,6 @@
 			path = VoiceFlow;
 			sourceTree = "<group>";
 		};
-		GCORE1 /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				B10017 /* BrandConfiguration.swift */,
-			);
-			path = Core;
-			sourceTree = "<group>";
-		};
-		GCFG01 /* Configurations */ = {
-			isa = PBXGroup;
-			children = (
-				XCC001 /* Debug.xcconfig */,
-				XCC002 /* Release.xcconfig */,
-			);
-			name = Configurations;
-			path = Configurations/Variants/VoiceFlow;
-			sourceTree = "<group>";
-		};
 		G10003 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -176,17 +219,6 @@
 				B10021 /* WhisperKitService.swift */,
 			);
 			path = Services;
-			sourceTree = "<group>";
-		};
-		G10006 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				B10011 /* TranscriptionRecord.swift */,
-				B10012 /* TTSRecord.swift */,
-				B10013 /* SummaryRecord.swift */,
-				B10022 /* SummarizeSettings.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		G10004 /* Views */ = {
@@ -206,8 +238,20 @@
 			children = (
 				P10001 /* VoiceFlow.app */,
 				P20001 /* VoiceFlowKeyboard.appex */,
+				665F6E1DAEAE1E1E675953AB /* VoiceFlowTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		G10006 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B10011 /* TranscriptionRecord.swift */,
+				B10012 /* TTSRecord.swift */,
+				B10013 /* SummaryRecord.swift */,
+				B10022 /* SummarizeSettings.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		G20001 /* VoiceFlowKeyboard */ = {
@@ -220,26 +264,44 @@
 			path = VoiceFlowKeyboard;
 			sourceTree = "<group>";
 		};
+		GCFG01 /* Configurations */ = {
+			isa = PBXGroup;
+			children = (
+				XCC001 /* Debug.xcconfig */,
+				XCC002 /* Release.xcconfig */,
+			);
+			name = Configurations;
+			path = Configurations/Variants/VoiceFlow;
+			sourceTree = "<group>";
+		};
+		GCORE1 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				B10017 /* BrandConfiguration.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-			SP1001 /* Copy Variant Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+		9215CC5051E8B00408ECB108 /* VoiceFlowTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 05237242BD039828B9972D08 /* Build configuration list for PBXNativeTarget "VoiceFlowTests" */;
+			buildPhases = (
+				5BB06E9403C4197F7BD6315F /* Sources */,
+				ED2BB87757914BB908242097 /* Frameworks */,
+				2B9C2DEA49CC19DD85FCF5ED /* Resources */,
 			);
-			inputFileListPaths = (
+			buildRules = (
 			);
-			inputPaths = (
+			dependencies = (
+				6A85A14DA2E2A87993EF9FE0 /* PBXTargetDependency */,
 			);
-			name = "Copy Variant Resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PROJECT_DIR}/Configurations/Scripts/copy-variant-resources.sh\"\n";
+			name = VoiceFlowTests;
+			productName = VoiceFlowTests;
+			productReference = 665F6E1DAEAE1E1E675953AB /* VoiceFlowTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		T10001 /* VoiceFlow */ = {
 			isa = PBXNativeTarget;
@@ -311,11 +373,19 @@
 			targets = (
 				T10001 /* VoiceFlow */,
 				T20001 /* VoiceFlowKeyboard */,
+				9215CC5051E8B00408ECB108 /* VoiceFlowTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2B9C2DEA49CC19DD85FCF5ED /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		R10001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -333,7 +403,40 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		SP1001 /* Copy Variant Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Variant Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PROJECT_DIR}/Configurations/Scripts/copy-variant-resources.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		5BB06E9403C4197F7BD6315F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				75FB3A37B0EE2579AB9BDF5D /* ElevenLabsServiceTests.swift in Sources */,
+				D7A2E3AADC50C896F1997695 /* STTSettingsTests.swift in Sources */,
+				CDEAA6816C6EF65667D25B42 /* SharedDataHandlerTests.swift in Sources */,
+				16434A020173C05A4119FA8D /* SummarizeSettingsTests.swift in Sources */,
+				090D78AB659C19289EE49415 /* WhisperKitServiceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		S10001 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -377,6 +480,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		6A85A14DA2E2A87993EF9FE0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = VoiceFlow;
+			target = T10001 /* VoiceFlow */;
+			targetProxy = 2F9106E0073E1585B1F17E32 /* PBXContainerItemProxy */;
+		};
 		DEP2001 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = T20001 /* VoiceFlowKeyboard */;
@@ -385,6 +494,25 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		9DA1EEE57F95B0A880B873A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lubodev.voiceflow.tests;
+				PRODUCT_MODULE_NAME = VoiceFlowTests;
+				PRODUCT_NAME = VoiceFlowTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VoiceFlow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VoiceFlow";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		BC1001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = XCC001 /* Debug.xcconfig */;
@@ -507,9 +635,36 @@
 			};
 			name = Release;
 		};
+		E21FA937CBB333EAE24D15CB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lubodev.voiceflow.tests;
+				PRODUCT_MODULE_NAME = VoiceFlowTests;
+				PRODUCT_NAME = VoiceFlowTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VoiceFlow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VoiceFlow";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		05237242BD039828B9972D08 /* Build configuration list for PBXNativeTarget "VoiceFlowTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9DA1EEE57F95B0A880B873A0 /* Release */,
+				E21FA937CBB333EAE24D15CB /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C10001 /* Build configuration list for PBXProject "VoiceFlow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -538,7 +693,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = PR1001 /* Project object */;
 }
