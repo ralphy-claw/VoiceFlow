@@ -36,6 +36,7 @@ struct SummarizeView: View {
                                             .labelStyle(.iconOnly)
                                             .font(.caption)
                                     }
+                                    .buttonStyle(.borderless)
                                     .tint(.secondary)
                                 }
                             }
