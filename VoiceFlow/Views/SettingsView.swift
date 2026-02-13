@@ -1,19 +1,88 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @StateObject private var viewModel = SettingsViewModel()
+    @StateObject private var openAIViewModel = ProviderViewModel(provider: OpenAIProvider())
+    @StateObject private var elevenLabsViewModel = ProviderViewModel(provider: ElevenLabsProvider())
+    @StateObject private var whisperKitService = WhisperKitService.shared
+    @State private var sttSettings = STTSettings()
+    @State private var summarizeSettings = SummarizeSettings()
     
     var body: some View {
         NavigationStack {
             List {
+                // MARK: - Provider Preferences
                 Section {
-                    apiKeyRow
-                    testButton
+                    Picker("Speech-to-Text", selection: $sttSettings.provider) {
+                        ForEach(STTProvider.allCases, id: \.self) { provider in
+                            Text(provider.rawValue).tag(provider)
+                        }
+                    }
+                    
+                    if sttSettings.provider == .local {
+                        HStack {
+                            if whisperKitService.isModelDownloaded {
+                                Label("Model Ready", systemImage: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                            } else {
+                                Button {
+                                    Task {
+                                        try? await whisperKitService.downloadModel()
+                                    }
+                                } label: {
+                                    if whisperKitService.isDownloading {
+                                        HStack {
+                                            ProgressView()
+                                                .tint(.bitcoinOrange)
+                                            Text("\(Int(whisperKitService.downloadProgress * 100))%")
+                                        }
+                                    } else {
+                                        Label("Download Model", systemImage: "arrow.down.circle")
+                                    }
+                                }
+                                .disabled(whisperKitService.isDownloading)
+                            }
+                        }
+                    }
+                    
+                    Picker("Summarization Length", selection: $summarizeSettings.length) {
+                        ForEach(SummaryLength.allCases, id: \.self) { length in
+                            Text(length.rawValue).tag(length)
+                        }
+                    }
+                    
+                    Picker("Summary Format", selection: $summarizeSettings.format) {
+                        ForEach(SummaryFormat.allCases, id: \.self) { format in
+                            Text(format.rawValue).tag(format)
+                        }
+                    }
+                } header: {
+                    Label("Provider Preferences", systemImage: "slider.horizontal.3")
+                        .foregroundColor(.bitcoinOrange)
+                } footer: {
+                    Text("Choose default providers for each operation. You can override these in each tab.")
+                        .foregroundColor(.gray)
+                }
+                
+                // MARK: - API Keys
+                Section {
+                    apiKeyRow(viewModel: openAIViewModel)
+                    testButton(viewModel: openAIViewModel)
                 } header: {
                     Label("OpenAI", systemImage: "brain.head.profile")
                         .foregroundColor(.bitcoinOrange)
                 } footer: {
-                    Text("Your API key is stored securely in the iOS Keychain.")
+                    Text("Used for Whisper STT, ChatGPT Summarization, and OpenAI TTS.")
+                        .foregroundColor(.gray)
+                }
+                
+                Section {
+                    apiKeyRow(viewModel: elevenLabsViewModel)
+                    testButton(viewModel: elevenLabsViewModel)
+                } header: {
+                    Label("ElevenLabs", systemImage: "waveform.badge.mic")
+                        .foregroundColor(.bitcoinOrange)
+                } footer: {
+                    Text("Optional: Use ElevenLabs for higher quality text-to-speech. Your API key is stored securely in the iOS Keychain.")
                         .foregroundColor(.gray)
                 }
             }
@@ -25,15 +94,16 @@ struct SettingsView: View {
     }
     
     // MARK: - API Key Row
-    private var apiKeyRow: some View {
+    @ViewBuilder
+    private func apiKeyRow(viewModel: ProviderViewModel) -> some View {
         HStack {
             if viewModel.isRevealed {
-                TextField("sk-...", text: $viewModel.apiKeyInput)
+                TextField("Enter API Key", text: viewModel.$apiKeyInput)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .font(.system(.body, design: .monospaced))
             } else {
-                SecureField("Enter API Key", text: $viewModel.apiKeyInput)
+                SecureField("Enter API Key", text: viewModel.$apiKeyInput)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
             }
@@ -53,7 +123,8 @@ struct SettingsView: View {
     }
     
     // MARK: - Test Button
-    private var testButton: some View {
+    @ViewBuilder
+    private func testButton(viewModel: ProviderViewModel) -> some View {
         HStack {
             Button {
                 Task { await viewModel.testKey() }
@@ -69,14 +140,14 @@ struct SettingsView: View {
             
             Spacer()
             
-            statusBadge
+            statusBadge(for: viewModel)
         }
         .listRowBackground(Color.darkSurface)
     }
     
     // MARK: - Status Badge
     @ViewBuilder
-    private var statusBadge: some View {
+    private func statusBadge(for viewModel: ProviderViewModel) -> some View {
         switch viewModel.status {
         case .untested:
             Label("Untested", systemImage: "questionmark.circle")
@@ -99,14 +170,15 @@ struct SettingsView: View {
 
 // MARK: - ViewModel
 @MainActor
-class SettingsViewModel: ObservableObject {
+class ProviderViewModel: ObservableObject {
     @Published var apiKeyInput: String = ""
     @Published var isRevealed = false
     @Published var status: APIKeyStatus = .untested
     
-    private let provider = OpenAIProvider()
+    private let provider: any ServiceProvider
     
-    init() {
+    init(provider: any ServiceProvider) {
+        self.provider = provider
         apiKeyInput = provider.apiKey ?? ""
         if !apiKeyInput.isEmpty {
             // Key exists but untested this session
@@ -115,7 +187,8 @@ class SettingsViewModel: ObservableObject {
     }
     
     func saveKey() {
-        provider.apiKey = apiKeyInput.isEmpty ? nil : apiKeyInput
+        var mutableProvider = provider
+        mutableProvider.apiKey = apiKeyInput.isEmpty ? nil : apiKeyInput
         status = .untested
     }
     
@@ -130,7 +203,7 @@ class SettingsViewModel: ObservableObject {
 // MARK: - Onboarding Sheet
 struct APIKeyOnboardingView: View {
     @Binding var isPresented: Bool
-    @StateObject private var viewModel = SettingsViewModel()
+    @StateObject private var viewModel = ProviderViewModel(provider: OpenAIProvider())
     
     var body: some View {
         NavigationStack {
