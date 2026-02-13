@@ -1,6 +1,17 @@
 import AVFoundation
 import Foundation
 
+enum AudioRecorderError: LocalizedError {
+    case microphonePermissionDenied
+    
+    var errorDescription: String? {
+        switch self {
+        case .microphonePermissionDenied:
+            return "Microphone access denied. Please allow microphone access in Settings → Privacy & Security → Microphone."
+        }
+    }
+}
+
 @MainActor
 class AudioRecorder: ObservableObject {
     @Published var isRecording = false
@@ -22,6 +33,24 @@ class AudioRecorder: ObservableObject {
     private var onSegmentComplete: ((URL) -> Void)?
     
     var recordedFileURL: URL? { fileURL }
+    
+    /// Check and request microphone permission. Returns true if granted.
+    func ensureMicrophonePermission() async throws {
+        let permission = AVAudioApplication.shared.recordPermission
+        switch permission {
+        case .granted:
+            return
+        case .undetermined:
+            let granted = await AVAudioApplication.requestRecordPermission()
+            if !granted {
+                throw AudioRecorderError.microphonePermissionDenied
+            }
+        case .denied:
+            throw AudioRecorderError.microphonePermissionDenied
+        @unknown default:
+            break
+        }
+    }
     
     func startRecording() throws {
         let session = AVAudioSession.sharedInstance()

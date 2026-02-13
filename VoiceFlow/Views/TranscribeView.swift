@@ -587,20 +587,23 @@ struct TranscribeView: View {
                 UIAccessibility.post(notification: .announcement, argument: "Recording stopped, transcribing")
             }
         } else {
-            do {
-                HapticService.impact(.heavy)
-                UIAccessibility.post(notification: .announcement, argument: "Recording started")
-                if continuousMode {
-                    continuousText = ""
-                    try recorder.startContinuousRecording { segmentURL in
-                        transcribeSegment(at: segmentURL)
+            Task {
+                do {
+                    try await recorder.ensureMicrophonePermission()
+                    HapticService.impact(.heavy)
+                    UIAccessibility.post(notification: .announcement, argument: "Recording started")
+                    if continuousMode {
+                        continuousText = ""
+                        try recorder.startContinuousRecording { segmentURL in
+                            transcribeSegment(at: segmentURL)
+                        }
+                    } else {
+                        try recorder.startRecording()
                     }
-                } else {
-                    try recorder.startRecording()
+                } catch {
+                    errorMessage = error.localizedDescription
+                    showError = true
                 }
-            } catch {
-                errorMessage = error.localizedDescription
-                showError = true
             }
         }
     }
