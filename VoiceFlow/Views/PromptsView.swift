@@ -23,6 +23,7 @@ struct PromptsView: View {
     // Image generation
     @State private var isGeneratingImage = false
     @State private var generatedImage: UIImage?
+    @AppStorage("selectedImageModel") private var selectedImageModel: String = ImageModel.gemini.rawValue
 
     // Creation flow
     @State private var showCreator = false
@@ -397,6 +398,9 @@ struct PromptsView: View {
                 .tint(.secondary)
             }
             
+            // Image model picker
+            imageModelPicker
+
             // Generate Image button
             Button {
                 HapticService.impact(.medium)
@@ -439,6 +443,43 @@ struct PromptsView: View {
                     }
                     .buttonStyle(.bordered)
                     .tint(.bitcoinOrange)
+                }
+            }
+        }
+    }
+
+    // MARK: - Image Model Picker
+    private var imageModelPicker: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(ImageModel.allCases) { model in
+                    let isSelected = selectedImageModel == model.rawValue
+                    let service = ImageModelManager.shared.service(for: model)
+                    Button {
+                        HapticService.impact(.light)
+                        selectedImageModel = model.rawValue
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: model.icon)
+                                .font(.caption2)
+                            Text(model.rawValue)
+                                .font(.caption.weight(.medium))
+                            if !service.hasValidAPIKey {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.caption2)
+                                    .foregroundStyle(.yellow)
+                            }
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(isSelected ? Color.bitcoinOrange.opacity(0.2) : Color.darkSurfaceLight)
+                        .foregroundStyle(isSelected ? Color.bitcoinOrange : .secondary)
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule().stroke(isSelected ? Color.bitcoinOrange : .clear, lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.borderless)
                 }
             }
         }
@@ -604,9 +645,23 @@ struct PromptsView: View {
     private func generateImage(from prompt: String) {
         isGeneratingImage = true
         generatedImage = nil
+        let model = ImageModel(rawValue: selectedImageModel) ?? .gemini
+        let service = ImageModelManager.shared.service(for: model)
+
+        guard service.hasValidAPIKey else {
+            errorMessage = "No API key configured for \(model.rawValue). Add it in Settings."
+            showError = true
+            isGeneratingImage = false
+            HapticService.notification(.error)
+            return
+        }
+
         Task {
             do {
-                let image = try await GeminiImageService.shared.generateImage(prompt: prompt)
+                let data = try await service.generateImage(prompt: prompt)
+                guard let image = UIImage(data: data) else {
+                    throw NSError(domain: "ImageGen", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to decode image data"])
+                }
                 await MainActor.run {
                     generatedImage = image
                     isGeneratingImage = false
