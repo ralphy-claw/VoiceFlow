@@ -6,7 +6,7 @@ enum SharedDataHandler {
     
     // MARK: - Shared Text
     
-    struct SharedTextData {
+    struct SharedTextData: Equatable {
         let action: String
         let text: String
         let timestamp: TimeInterval
@@ -42,7 +42,7 @@ enum SharedDataHandler {
     
     // MARK: - Shared Audio
     
-    struct SharedAudioData {
+    struct SharedAudioData: Equatable {
         let fileURL: URL
         let timestamp: TimeInterval
     }
