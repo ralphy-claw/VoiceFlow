@@ -6,10 +6,36 @@ struct SettingsView: View {
     @StateObject private var whisperKitService = WhisperKitService.shared
     @State private var sttSettings = STTSettings()
     @State private var summarizeSettings = SummarizeSettings()
+    @State private var showKeyboardSetup = false
     
     var body: some View {
         NavigationStack {
             List {
+                // MARK: - Keyboard Setup
+                Section {
+                    Button {
+                        showKeyboardSetup = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "keyboard")
+                                .foregroundStyle(Color.bitcoinOrange)
+                            Text("Set Up VoiceFlow Keyboard")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .listRowBackground(Color.darkSurface)
+                } header: {
+                    Label("Keyboard Extension", systemImage: "keyboard")
+                        .foregroundColor(.bitcoinOrange)
+                } footer: {
+                    Text("Follow the setup guide to enable the VoiceFlow keyboard for voice typing in any app.")
+                        .foregroundColor(.gray)
+                }
+                
                 // MARK: - Provider Preferences
                 Section {
                     Picker("Speech-to-Text", selection: $sttSettings.provider) {
@@ -26,7 +52,11 @@ struct SettingsView: View {
                             } else {
                                 Button {
                                     Task {
-                                        try? await whisperKitService.downloadModel()
+                                        do {
+                                            try await whisperKitService.downloadModel()
+                                        } catch {
+                                            // errorMessage is already set on the service
+                                        }
                                     }
                                 } label: {
                                     if whisperKitService.isDownloading {
@@ -41,6 +71,12 @@ struct SettingsView: View {
                                 }
                                 .disabled(whisperKitService.isDownloading)
                             }
+                        }
+                        
+                        if let error = whisperKitService.errorMessage {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundStyle(.red)
                         }
                     }
                     
@@ -103,6 +139,9 @@ struct SettingsView: View {
             .contentMargins(.bottom, 32, for: .scrollContent)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
+            .sheet(isPresented: $showKeyboardSetup) {
+                KeyboardSetupGuideView()
+            }
         }
     }
     

@@ -1,19 +1,24 @@
 import Foundation
-// import WhisperKit  // TODO: Add WhisperKit package dependency via Xcode
+#if canImport(WhisperKit)
+import WhisperKit
+#endif
 
 enum WhisperKitError: LocalizedError {
     case notAvailable
     case transcriptionFailed(String)
     case modelNotDownloaded
+    case downloadFailed(String)
     
     var errorDescription: String? {
         switch self {
         case .notAvailable:
-            return "WhisperKit is not available on this device"
+            return "On-device transcription is not yet available. WhisperKit support is coming soon — please use Cloud (OpenAI Whisper) for now."
         case .transcriptionFailed(let msg):
             return "Transcription failed: \(msg)"
         case .modelNotDownloaded:
-            return "Whisper model not downloaded. Please download it first."
+            return "Whisper model not downloaded. Please download it first in Settings."
+        case .downloadFailed(let msg):
+            return "Model download failed: \(msg)"
         }
     }
 }
@@ -25,15 +30,16 @@ class WhisperKitService: ObservableObject {
     @Published var isModelDownloaded = false
     @Published var downloadProgress: Double = 0
     @Published var isDownloading = false
+    @Published var errorMessage: String?
     
-    // Uncomment when WhisperKit is added:
-    // private var whisperKit: WhisperKit?
+    #if canImport(WhisperKit)
+    private var whisperKit: WhisperKit?
+    #endif
     
     private let modelName = "openai/whisper-base"
     
     func initialize() async {
-        // TODO: Uncomment when WhisperKit package is added
-        /*
+        #if canImport(WhisperKit)
         do {
             whisperKit = try await WhisperKit(model: modelName)
             isModelDownloaded = true
@@ -41,42 +47,38 @@ class WhisperKitService: ObservableObject {
             print("WhisperKit initialization failed: \(error)")
             isModelDownloaded = false
         }
-        */
-        
-        // For now, just mark as not available
+        #else
         isModelDownloaded = false
+        #endif
     }
     
     func downloadModel() async throws {
+        #if canImport(WhisperKit)
         isDownloading = true
+        errorMessage = nil
         defer { isDownloading = false }
         
-        // TODO: Implement model download when WhisperKit is added
-        /*
         do {
-            whisperKit = try await WhisperKit(model: modelName, downloadProgress: { progress in
+            whisperKit = try await WhisperKit(model: modelName) { progress in
                 Task { @MainActor in
                     self.downloadProgress = progress.fractionCompleted
                 }
-            })
+            }
             isModelDownloaded = true
         } catch {
-            throw WhisperKitError.transcriptionFailed(error.localizedDescription)
+            errorMessage = error.localizedDescription
+            throw WhisperKitError.downloadFailed(error.localizedDescription)
         }
-        */
-        
+        #else
+        errorMessage = WhisperKitError.notAvailable.errorDescription
         throw WhisperKitError.notAvailable
+        #endif
     }
     
     func transcribe(audioURL: URL, language: String? = nil) async throws -> String {
-        guard isModelDownloaded else {
+        #if canImport(WhisperKit)
+        guard isModelDownloaded, let whisperKit = whisperKit else {
             throw WhisperKitError.modelNotDownloaded
-        }
-        
-        // TODO: Implement transcription when WhisperKit is added
-        /*
-        guard let whisperKit = whisperKit else {
-            throw WhisperKitError.notAvailable
         }
         
         do {
@@ -84,14 +86,14 @@ class WhisperKitService: ObservableObject {
             if let language = language {
                 options.language = language
             }
-            let result = try await whisperKit.transcribe(audioPath: audioURL.path, decodeOptions: options)
-            return result.text
+            let results = try await whisperKit.transcribe(audioPath: audioURL.path, decodeOptions: options)
+            return results.map { $0.text }.joined(separator: " ")
         } catch {
             throw WhisperKitError.transcriptionFailed(error.localizedDescription)
         }
-        */
-        
+        #else
         throw WhisperKitError.notAvailable
+        #endif
     }
 }
 
