@@ -334,9 +334,11 @@ struct TranscribeView: View {
             }
             .scrollContentBackground(.hidden)
             .background(Color.darkBackground.ignoresSafeArea())
-            .onTapGesture {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            }
+            .simultaneousGesture(
+                TapGesture().onEnded {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+            )
             .navigationTitle("Transcribe")
             .toast(isShowing: $showCopyToast, message: "Copied to clipboard")
             .alert("Error", isPresented: $showError) {

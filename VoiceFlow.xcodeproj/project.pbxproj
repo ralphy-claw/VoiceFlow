@@ -53,6 +53,7 @@
 		A10035 /* AudioPlaybackBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10035 /* AudioPlaybackBar.swift */; };
 		A10036 /* AudioLevelMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10036 /* AudioLevelMeter.swift */; };
 		A10037 /* LanguagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10037 /* LanguagePickerView.swift */; };
+		A10038 /* KeyboardSetupGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10038 /* KeyboardSetupGuideView.swift */; };
 		A20030 /* APIKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10030 /* APIKeyHelper.swift */; };
 /* End PBXBuildFile section */
 
@@ -144,6 +145,7 @@
 		B10035 /* AudioPlaybackBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlaybackBar.swift; sourceTree = "<group>"; };
 		B10036 /* AudioLevelMeter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevelMeter.swift; sourceTree = "<group>"; };
 		B10037 /* LanguagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickerView.swift; sourceTree = "<group>"; };
+		B10038 /* KeyboardSetupGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSetupGuideView.swift; sourceTree = "<group>"; };
 		PUIREF /* VoiceFlowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceFlowUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		P10001 /* VoiceFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		P20001 /* VoiceFlowKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VoiceFlowKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -288,6 +290,7 @@
 				B10016 /* SettingsView.swift */,
 				B10023 /* ToastView.swift */,
 				B10037 /* LanguagePickerView.swift */,
+				B10038 /* KeyboardSetupGuideView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -569,6 +572,7 @@
 				A10035 /* AudioPlaybackBar.swift in Sources */,
 				A10036 /* AudioLevelMeter.swift in Sources */,
 				A10037 /* LanguagePickerView.swift in Sources */,
+				A10038 /* KeyboardSetupGuideView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -707,7 +711,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = VoiceFlowKeyboard/VoiceFlowKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 138;
+				CURRENT_PROJECT_VERSION = 141;
 				DEVELOPMENT_TEAM = 79NK8S894T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VoiceFlowKeyboard/Info.plist;
@@ -733,7 +737,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = VoiceFlowKeyboard/VoiceFlowKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 138;
+				CURRENT_PROJECT_VERSION = 141;
 				DEVELOPMENT_TEAM = 79NK8S894T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VoiceFlowKeyboard/Info.plist;
