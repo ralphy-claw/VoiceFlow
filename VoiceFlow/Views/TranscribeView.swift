@@ -3,6 +3,8 @@ import SwiftData
 import UniformTypeIdentifiers
 
 struct TranscribeView: View {
+    @Binding var sharedAudioData: SharedDataHandler.SharedAudioData?
+    
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TranscriptionRecord.timestamp, order: .reverse) private var history: [TranscriptionRecord]
     @StateObject private var recorder = AudioRecorder()
@@ -13,6 +15,8 @@ struct TranscribeView: View {
     @State private var showFilePicker = false
     @State private var lastSourceType = "recording"
     @State private var expandedRecordID: UUID?
+    @State private var showCopyToast = false
+    @State private var sttSettings = STTSettings()
     
     var body: some View {
         NavigationStack {
@@ -52,6 +56,15 @@ struct TranscribeView: View {
                         }
                         .frame(maxWidth: .infinity)
                         
+                        // Provider toggle
+                        Picker("Provider", selection: $sttSettings.provider) {
+                            ForEach(STTProvider.allCases, id: \.self) { provider in
+                                Text(provider.rawValue).tag(provider)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .disabled(isTranscribing || recorder.isRecording)
+                        
                         if recorder.isRecording {
                             Text(String(format: "%.1fs", recorder.recordingTime))
                                 .font(.title2.monospacedDigit())
@@ -71,11 +84,24 @@ struct TranscribeView: View {
                                     Spacer()
                                     Button {
                                         UIPasteboard.general.string = transcription
+                                        HapticService.notification(.success)
+                                        withAnimation {
+                                            showCopyToast = true
+                                        }
                                     } label: {
                                         Label("Copy", systemImage: "doc.on.doc")
                                             .font(.caption)
                                     }
                                     .tint(.bitcoinOrange)
+                                    
+                                    Button {
+                                        transcription = ""
+                                        HapticService.impact(.light)
+                                    } label: {
+                                        Label("Clear", systemImage: "trash")
+                                            .font(.caption)
+                                    }
+                                    .tint(.red)
                                 }
                                 
                                 Text(transcription)
@@ -83,6 +109,25 @@ struct TranscribeView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .background(Color.darkSurfaceLight)
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .textSelection(.enabled)
+                                    .contextMenu {
+                                        Button {
+                                            UIPasteboard.general.string = transcription
+                                            HapticService.notification(.success)
+                                            withAnimation {
+                                                showCopyToast = true
+                                            }
+                                        } label: {
+                                            Label("Copy", systemImage: "doc.on.doc")
+                                        }
+                                        
+                                        Button {
+                                            transcription = ""
+                                            HapticService.impact(.light)
+                                        } label: {
+                                            Label("Clear", systemImage: "trash")
+                                        }
+                                    }
                             }
                         }
                     }
@@ -117,6 +162,7 @@ struct TranscribeView: View {
             .scrollContentBackground(.hidden)
             .background(Color.darkBackground.ignoresSafeArea())
             .navigationTitle("Transcribe")
+            .toast(isShowing: $showCopyToast, message: "Copied to clipboard")
             .alert("Error", isPresented: $showError) {
                 Button("OK") {}
             } message: {
@@ -124,6 +170,12 @@ struct TranscribeView: View {
             }
             .fileImporter(isPresented: $showFilePicker, allowedContentTypes: [.audio, .mpeg4Audio, .mp3, .wav]) { result in
                 handleFileImport(result)
+            }
+            .onChange(of: sharedAudioData) { _, newData in
+                if let data = newData {
+                    handleSharedAudio(data)
+                    sharedAudioData = nil
+                }
             }
         }
     }
@@ -137,11 +189,13 @@ struct TranscribeView: View {
     
     private func handleRecord() {
         if recorder.isRecording {
+            HapticService.impact(.medium)
             guard let url = recorder.stopRecording() else { return }
             lastSourceType = "recording"
             transcribeFile(at: url, sourceType: "recording", duration: recorder.recordingTime)
         } else {
             do {
+                HapticService.impact(.heavy)
                 try recorder.startRecording()
             } catch {
                 errorMessage = error.localizedDescription
@@ -171,8 +225,17 @@ struct TranscribeView: View {
         isTranscribing = true
         Task {
             do {
-                let data = try Data(contentsOf: url)
-                let text = try await OpenAIService.shared.transcribe(audioData: data, filename: url.lastPathComponent)
+                let text: String
+                
+                switch sttSettings.provider {
+                case .cloud:
+                    let data = try Data(contentsOf: url)
+                    text = try await OpenAIService.shared.transcribe(audioData: data, filename: url.lastPathComponent)
+                    
+                case .local:
+                    text = try await WhisperKitService.shared.transcribe(audioURL: url)
+                }
+                
                 transcription = text
                 let record = TranscriptionRecord(sourceType: sourceType, transcribedText: text, duration: duration)
                 modelContext.insert(record)
@@ -183,6 +246,12 @@ struct TranscribeView: View {
             }
             isTranscribing = false
         }
+    }
+    
+    private func handleSharedAudio(_ data: SharedDataHandler.SharedAudioData) {
+        transcribeFile(at: data.fileURL, sourceType: "share", duration: nil)
+        // Clean up shared data
+        SharedDataHandler.clearSharedAudio()
     }
 }
 
