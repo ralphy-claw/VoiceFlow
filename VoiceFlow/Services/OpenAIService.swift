@@ -77,16 +77,18 @@ actor OpenAIService {
     }
     
     // MARK: - Summarize
-    func summarize(text: String) async throws -> String {
+    func summarize(text: String, systemPrompt: String? = nil) async throws -> String {
         var request = URLRequest(url: URL(string: Config.chatEndpoint)!)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
+        let defaultPrompt = "You are a helpful assistant. Summarize the following text concisely while keeping key points."
+        
         let payload: [String: Any] = [
             "model": Config.chatModel,
             "messages": [
-                ["role": "system", "content": "You are a helpful assistant. Summarize the following text concisely while keeping key points."],
+                ["role": "system", "content": systemPrompt ?? defaultPrompt],
                 ["role": "user", "content": text]
             ],
             "temperature": 0.3
