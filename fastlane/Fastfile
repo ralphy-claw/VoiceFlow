@@ -40,6 +40,15 @@ platform :ios do
       xcodeproj: "VoiceFlow.xcodeproj"
     )
 
+    # Also update xcconfig (overrides pbxproj setting)
+    xcconfig_path = File.join(Dir.pwd, "..", "Configurations", "Base", "Base.xcconfig")
+    if File.exist?(xcconfig_path)
+      content = File.read(xcconfig_path)
+      content.gsub!(/CURRENT_PROJECT_VERSION\s*=\s*\d+/, "CURRENT_PROJECT_VERSION = #{build_number}")
+      File.write(xcconfig_path, content)
+      UI.message("Updated Base.xcconfig build number to #{build_number}")
+    end
+
     key_path = ENV["ASC_KEY_VOICEFLOW_FILEPATH"] || "/Users/ralphy-claw/.openclaw/workspace/projects/Pixella/fastlane/AuthKey_PIXELLA.p8"
     key_id = ENV["ASC_KEY_VOICEFLOW_ID"] || "CPWGH6B5H6"
     key_issuer = ENV["ASC_KEY_VOICEFLOW_ISSUER_ID"] || "e576b7d5-3c0e-4d7d-ae33-294c6639571a"
