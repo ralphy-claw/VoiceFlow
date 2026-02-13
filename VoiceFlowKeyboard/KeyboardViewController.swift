@@ -147,7 +147,9 @@ class KeyboardViewController: UIInputViewController {
         languageButton.backgroundColor = darkSurface
         languageButton.layer.cornerRadius = 12
         languageButton.clipsToBounds = true
-        languageButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+        var langConfig = UIButton.Configuration.plain()
+        langConfig.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 10, bottom: 4, trailing: 10)
+        languageButton.configuration = langConfig
         languageButton.showsMenuAsPrimaryAction = true
         languageButton.accessibilityLabel = "Language selector"
         languageButton.accessibilityHint = "Tap to change transcription language"
@@ -391,15 +393,16 @@ class KeyboardViewController: UIInputViewController {
             return
         }
         
-        let micPermission = AVAudioSession.sharedInstance().recordPermission
+        let micPermission = AVAudioApplication.shared.recordPermission
         switch micPermission {
         case .undetermined:
-            AVAudioSession.sharedInstance().requestRecordPermission { [weak self] granted in
-                DispatchQueue.main.async {
+            Task {
+                let granted = await AVAudioApplication.requestRecordPermission()
+                await MainActor.run {
                     if granted {
-                        self?.startRecording()
+                        self.startRecording()
                     } else {
-                        self?.state = .error("🎤 Microphone access denied. Allow in Settings → Privacy → Microphone.")
+                        self.state = .error("🎤 Microphone access denied. Allow in Settings → Privacy → Microphone.")
                     }
                 }
             }

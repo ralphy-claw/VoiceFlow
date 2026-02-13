@@ -283,8 +283,7 @@ struct KeyboardSetupBanner: View {
     }
 
     private func checkStatus() {
-        isKeyboardReady = KeyboardStatusChecker.isKeyboardEnabled ||
-            UserDefaults.standard.bool(forKey: "hasCompletedKeyboardOnboarding")
+        isKeyboardReady = KeyboardStatusChecker.isKeyboardEnabled
     }
 }
 
