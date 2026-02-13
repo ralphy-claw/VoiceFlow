@@ -487,11 +487,7 @@ struct TranscribeView: View {
             .scrollContentBackground(.hidden)
             .background(Color.darkBackground.ignoresSafeArea())
             .searchable(text: $searchText, prompt: "Search transcriptions")
-            .simultaneousGesture(
-                TapGesture().onEnded {
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                }
-            )
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Transcribe")
             .toast(isShowing: $showCopyToast, message: "Copied to clipboard")
             .alert("Error", isPresented: $showError) {
