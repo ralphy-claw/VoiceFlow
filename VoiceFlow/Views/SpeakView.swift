@@ -217,19 +217,6 @@ struct SpeakView: View {
             }
         }
     }
-}
-
-// MARK: - Share Sheet
-
-struct ShareSheet: UIViewControllerRepresentable {
-    let activityItems: [Any]
-    
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-    }
-    
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
-}
     
     private func deleteRecords(at offsets: IndexSet) {
         for index in offsets {
@@ -324,6 +311,18 @@ struct ShareSheet: UIViewControllerRepresentable {
     }
 }
 
+// MARK: - Share Sheet
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
 // MARK: - History Row
 
 private struct TTSHistoryRow: View {
@@ -397,6 +396,6 @@ private struct TTSHistoryRow: View {
 }
 
 #Preview {
-    SpeakView()
+    SpeakView(sharedText: .constant(nil))
         .preferredColorScheme(.dark)
 }
