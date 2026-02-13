@@ -124,6 +124,8 @@ struct SpeakView: View {
                         ) {
                             generateSpeech()
                         }
+                        .accessibilityLabel("Generate speech")
+                        .accessibilityHint("Double-tap to convert text to spoken audio")
                         
                         if showPlaybackBar {
                             AudioPlaybackBar(

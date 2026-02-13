@@ -55,6 +55,9 @@
 		A10037 /* LanguagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10037 /* LanguagePickerView.swift */; };
 		A10038 /* KeyboardSetupGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10038 /* KeyboardSetupGuideView.swift */; };
 		A20030 /* APIKeyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10030 /* APIKeyHelper.swift */; };
+		A10040 /* KeyboardStatusChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10040 /* KeyboardStatusChecker.swift */; };
+		A10041 /* KeyboardOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10041 /* KeyboardOnboardingView.swift */; };
+		A10042 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10042 /* NetworkMonitor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,6 +149,9 @@
 		B10036 /* AudioLevelMeter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevelMeter.swift; sourceTree = "<group>"; };
 		B10037 /* LanguagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickerView.swift; sourceTree = "<group>"; };
 		B10038 /* KeyboardSetupGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSetupGuideView.swift; sourceTree = "<group>"; };
+		B10040 /* KeyboardStatusChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardStatusChecker.swift; sourceTree = "<group>"; };
+		B10041 /* KeyboardOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardOnboardingView.swift; sourceTree = "<group>"; };
+		B10042 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		PUIREF /* VoiceFlowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceFlowUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		P10001 /* VoiceFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		P20001 /* VoiceFlowKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VoiceFlowKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -264,6 +270,8 @@
 				B10020 /* ElevenLabsService.swift */,
 				B10021 /* WhisperKitService.swift */,
 				B10030 /* APIKeyHelper.swift */,
+				B10040 /* KeyboardStatusChecker.swift */,
+				B10042 /* NetworkMonitor.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -291,6 +299,7 @@
 				B10023 /* ToastView.swift */,
 				B10037 /* LanguagePickerView.swift */,
 				B10038 /* KeyboardSetupGuideView.swift */,
+				B10041 /* KeyboardOnboardingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -573,6 +582,9 @@
 				A10036 /* AudioLevelMeter.swift in Sources */,
 				A10037 /* LanguagePickerView.swift in Sources */,
 				A10038 /* KeyboardSetupGuideView.swift in Sources */,
+				A10040 /* KeyboardStatusChecker.swift in Sources */,
+				A10041 /* KeyboardOnboardingView.swift in Sources */,
+				A10042 /* NetworkMonitor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

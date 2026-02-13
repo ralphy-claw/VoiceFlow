@@ -19,13 +19,18 @@ class KeyboardViewController: UIInputViewController {
     private var recordingStartTime: Date?
     private var recordingTimer: Timer?
     
-    /// Known Whisper hallucination outputs on silence/noise
+    /// Known Whisper hallucination outputs on silence/noise (#39)
     private let whisperHallucinations: Set<String> = [
         "you", "thank you", "thank you.", "thanks for watching!",
         "thanks for watching.", "the end.", "the end",
         "thanks for listening.", "thanks for listening!",
         "subscribe", "bye.", "bye", "so",
         "thank you for watching!", "thank you for watching.",
+        "subtitles by the amara.org community",
+        "subtitles", ".", "..", "...", "♪", "♪♪", "♪ ♪",
+        "thank you so much for watching!",
+        "please subscribe to the channel",
+        "thanks for watching",
     ]
 
     // MARK: - UI Elements
@@ -37,6 +42,7 @@ class KeyboardViewController: UIInputViewController {
     private let timerLabel = UILabel()
     private let glowLayer = CAShapeLayer()
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
+    private let languageButton = UIButton(type: .system) // #39
 
     // MARK: - Theme
     private let bitcoinOrange = UIColor(red: 247/255, green: 147/255, blue: 26/255, alpha: 1)
@@ -46,12 +52,37 @@ class KeyboardViewController: UIInputViewController {
     // MARK: - App Group
     private let appGroupID = "group.com.lubodev.voiceflow"
     
+    // MARK: - Language (#39)
+    private var selectedLanguage: String {
+        get {
+            UserDefaults(suiteName: appGroupID)?.string(forKey: "stt_language") ?? "auto"
+        }
+        set {
+            UserDefaults(suiteName: appGroupID)?.set(newValue, forKey: "stt_language")
+            updateLanguageButton()
+        }
+    }
+    
+    private let supportedLanguages: [(code: String, name: String)] = [
+        ("auto", "Auto"),
+        ("en", "English"),
+        ("bg", "Bulgarian"),
+        ("es", "Spanish"),
+        ("fr", "French"),
+        ("de", "German"),
+        ("ja", "Japanese"),
+        ("zh", "Chinese"),
+        ("ru", "Russian"),
+        ("pt", "Portuguese"),
+        ("it", "Italian"),
+        ("ko", "Korean"),
+    ]
+    
     // MARK: - Audio
     private var audioFileURL: URL {
         if let dir = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) {
             return dir.appendingPathComponent("keyboard_recording.m4a")
         }
-        // Fallback — log this so we know
         NSLog("[VoiceFlowKB] App Group container unavailable, using temp directory")
         return FileManager.default.temporaryDirectory.appendingPathComponent("keyboard_recording.m4a")
     }
@@ -106,16 +137,34 @@ class KeyboardViewController: UIInputViewController {
         fullAccessBanner.layer.cornerRadius = 8
         fullAccessBanner.clipsToBounds = true
         fullAccessBanner.isHidden = true
+        fullAccessBanner.accessibilityLabel = "Full Access required. Enable in Settings, Keyboards, VoiceFlow."
         containerView.addSubview(fullAccessBanner)
 
-        // Mic button — large, centered, Bitcoin orange
+        // Language button (#39)
+        languageButton.translatesAutoresizingMaskIntoConstraints = false
+        languageButton.titleLabel?.font = .monospacedSystemFont(ofSize: 12, weight: .bold)
+        languageButton.setTitleColor(bitcoinOrange, for: .normal)
+        languageButton.backgroundColor = darkSurface
+        languageButton.layer.cornerRadius = 12
+        languageButton.clipsToBounds = true
+        languageButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+        languageButton.showsMenuAsPrimaryAction = true
+        languageButton.accessibilityLabel = "Language selector"
+        languageButton.accessibilityHint = "Tap to change transcription language"
+        updateLanguageButton()
+        buildLanguageMenu()
+        containerView.addSubview(languageButton)
+
+        // Mic button
         micButton.translatesAutoresizingMaskIntoConstraints = false
         micButton.layer.cornerRadius = 36
         micButton.clipsToBounds = false
         micButton.addTarget(self, action: #selector(micTapped), for: .touchUpInside)
+        micButton.accessibilityLabel = "Record"
+        micButton.accessibilityHint = "Tap to start voice recording"
         containerView.addSubview(micButton)
         
-        // Glow layer (behind button, for recording pulse)
+        // Glow layer
         glowLayer.fillColor = UIColor.clear.cgColor
         glowLayer.strokeColor = bitcoinOrange.cgColor
         glowLayer.lineWidth = 3
@@ -124,7 +173,7 @@ class KeyboardViewController: UIInputViewController {
         glowLayer.path = glowPath.cgPath
         micButton.layer.addSublayer(glowLayer)
 
-        // Hint label (idle state)
+        // Hint label
         hintLabel.translatesAutoresizingMaskIntoConstraints = false
         hintLabel.text = "Tap to speak"
         hintLabel.textColor = .lightGray
@@ -132,7 +181,7 @@ class KeyboardViewController: UIInputViewController {
         hintLabel.font = .systemFont(ofSize: 13, weight: .regular)
         containerView.addSubview(hintLabel)
         
-        // Timer label (recording state)
+        // Timer label
         timerLabel.translatesAutoresizingMaskIntoConstraints = false
         timerLabel.text = "0:00"
         timerLabel.textColor = .white
@@ -141,7 +190,7 @@ class KeyboardViewController: UIInputViewController {
         timerLabel.isHidden = true
         containerView.addSubview(timerLabel)
 
-        // Status label (errors / success)
+        // Status label
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
         statusLabel.text = ""
         statusLabel.textColor = .lightGray
@@ -150,7 +199,7 @@ class KeyboardViewController: UIInputViewController {
         statusLabel.numberOfLines = 2
         containerView.addSubview(statusLabel)
         
-        // Activity indicator (transcribing state)
+        // Activity indicator
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.color = bitcoinOrange
         activityIndicator.hidesWhenStopped = true
@@ -168,6 +217,11 @@ class KeyboardViewController: UIInputViewController {
             fullAccessBanner.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
             fullAccessBanner.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
             fullAccessBanner.heightAnchor.constraint(equalToConstant: 32),
+
+            // Language button top-right
+            languageButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
+            languageButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
+            languageButton.heightAnchor.constraint(equalToConstant: 28),
 
             micButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             micButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: -8),
@@ -189,6 +243,27 @@ class KeyboardViewController: UIInputViewController {
             statusLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
         ])
     }
+    
+    // MARK: - Language UI (#39)
+    
+    private func updateLanguageButton() {
+        let code = selectedLanguage == "auto" ? "AUTO" : selectedLanguage.uppercased()
+        languageButton.setTitle(code, for: .normal)
+    }
+    
+    private func buildLanguageMenu() {
+        let actions = supportedLanguages.map { lang in
+            UIAction(
+                title: lang.name,
+                subtitle: lang.code == "auto" ? nil : lang.code.uppercased(),
+                state: selectedLanguage == lang.code ? .on : .off
+            ) { [weak self] _ in
+                self?.selectedLanguage = lang.code
+                self?.buildLanguageMenu() // Refresh checkmarks
+            }
+        }
+        languageButton.menu = UIMenu(title: "Transcription Language", children: actions)
+    }
 
     private func updateMicButtonAppearance(recording: Bool) {
         let iconName = recording ? "stop.fill" : "mic.fill"
@@ -199,12 +274,12 @@ class KeyboardViewController: UIInputViewController {
         micButton.setImage(micImage, for: .normal)
         micButton.tintColor = darkBackground
         micButton.backgroundColor = bgColor
+        micButton.accessibilityLabel = recording ? "Stop recording" : "Start recording"
     }
     
     // MARK: - UI State Machine
     
     private func updateUI(for state: KeyboardState) {
-        // Reset all
         statusLabel.text = ""
         statusLabel.textColor = .lightGray
         timerLabel.isHidden = true
@@ -219,6 +294,7 @@ class KeyboardViewController: UIInputViewController {
             stopGlowAnimation()
             animateButtonScale(to: 1.0)
             micButton.isEnabled = hasFullAccess
+            languageButton.isHidden = false
             
         case .recording:
             updateMicButtonAppearance(recording: true)
@@ -229,6 +305,8 @@ class KeyboardViewController: UIInputViewController {
             timerLabel.text = "0:00"
             startGlowAnimation()
             animateButtonScale(to: 1.12)
+            languageButton.isHidden = true
+            UIAccessibility.post(notification: .announcement, argument: "Recording started")
             
         case .transcribing:
             updateMicButtonAppearance(recording: false)
@@ -237,6 +315,8 @@ class KeyboardViewController: UIInputViewController {
             stopGlowAnimation()
             animateButtonScale(to: 1.0)
             micButton.isEnabled = false
+            languageButton.isHidden = true
+            UIAccessibility.post(notification: .announcement, argument: "Transcribing audio")
             
         case .error(let message):
             updateMicButtonAppearance(recording: false)
@@ -246,8 +326,9 @@ class KeyboardViewController: UIInputViewController {
             stopGlowAnimation()
             animateButtonScale(to: 1.0)
             micButton.isEnabled = hasFullAccess
+            languageButton.isHidden = false
+            UIAccessibility.post(notification: .announcement, argument: "Error: \(message)")
             
-            // Clear error after 4 seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in
                 if case .error = self?.state {
                     self?.state = .idle
@@ -293,11 +374,9 @@ class KeyboardViewController: UIInputViewController {
     // MARK: - Recording
 
     @objc private func micTapped() {
-        // Tap feedback animation
         UIView.animate(withDuration: 0.1, animations: {
             self.micButton.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
         }) { _ in
-            // Let the state transition handle final scale
             if case .recording = self.state {
                 self.stopRecording()
             } else {
@@ -307,21 +386,18 @@ class KeyboardViewController: UIInputViewController {
     }
 
     private func startRecording() {
-        // 1. Check Full Access
         guard hasFullAccess else {
             state = .error("Enable Full Access in Settings → Keyboards → VoiceFlow")
             return
         }
         
-        // 2. Check microphone permission
         let micPermission = AVAudioSession.sharedInstance().recordPermission
         switch micPermission {
         case .undetermined:
-            // Request permission — will prompt user
             AVAudioSession.sharedInstance().requestRecordPermission { [weak self] granted in
                 DispatchQueue.main.async {
                     if granted {
-                        self?.startRecording() // Retry now that we have permission
+                        self?.startRecording()
                     } else {
                         self?.state = .error("🎤 Microphone access denied. Allow in Settings → Privacy → Microphone.")
                     }
@@ -332,18 +408,16 @@ class KeyboardViewController: UIInputViewController {
             state = .error("🎤 Microphone access denied. Allow in Settings → Privacy → Microphone.")
             return
         case .granted:
-            break // Continue
+            break
         @unknown default:
             break
         }
         
-        // 3. Check API key
         guard let apiKey = readAPIKey(), !apiKey.isEmpty else {
             state = .error("No API key. Set it in the VoiceFlow app.")
             return
         }
 
-        // 4. Configure audio session
         let session = AVAudioSession.sharedInstance()
         do {
             try session.setCategory(.record, mode: .default)
@@ -358,11 +432,9 @@ class KeyboardViewController: UIInputViewController {
             return
         }
 
-        // 5. Clean up any previous recording
         let fileURL = audioFileURL
         try? FileManager.default.removeItem(at: fileURL)
 
-        // 6. Initialize recorder
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
             AVSampleRateKey: 16000,
@@ -379,7 +451,6 @@ class KeyboardViewController: UIInputViewController {
             return
         }
         
-        // 7. Start recording and verify
         let started = audioRecorder?.record() ?? false
         if !started || audioRecorder?.isRecording != true {
             NSLog("[VoiceFlowKB] Recorder failed to start. isRecording=\(audioRecorder?.isRecording ?? false)")
@@ -388,11 +459,9 @@ class KeyboardViewController: UIInputViewController {
             return
         }
         
-        // 8. Success — update state
         recordingStartTime = Date()
         state = .recording
         
-        // Start timer
         recordingTimer?.invalidate()
         recordingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self, let start = self.recordingStartTime else { return }
@@ -404,21 +473,19 @@ class KeyboardViewController: UIInputViewController {
     }
 
     private func stopRecording() {
-        // Stop timer
         recordingTimer?.invalidate()
         recordingTimer = nil
         
         let duration = -(recordingStartTime ?? Date()).timeIntervalSinceNow
         audioRecorder?.stop()
         audioRecorder = nil
+        UIAccessibility.post(notification: .announcement, argument: "Recording stopped")
 
-        // Require at least 0.5s of audio
         guard duration >= 0.5 else {
             state = .error("Recording too short")
             return
         }
         
-        // Verify file exists and has content
         let fileURL = audioFileURL
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             NSLog("[VoiceFlowKB] Audio file missing after recording at: \(fileURL.path)")
@@ -442,6 +509,33 @@ class KeyboardViewController: UIInputViewController {
 
         state = .transcribing
         transcribeAudio()
+    }
+
+    // MARK: - Hallucination Filtering (#39)
+    
+    private func isHallucination(_ text: String, noSpeechProb: Double) -> Bool {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Empty or very short
+        if trimmed.isEmpty { return true }
+        
+        // High no-speech probability
+        if noSpeechProb > 0.5 { return true }
+        
+        // Known hallucination phrases
+        if whisperHallucinations.contains(trimmed.lowercased()) { return true }
+        
+        // Repeated single character/word patterns (e.g. "you you you")
+        let words = trimmed.lowercased().split(separator: " ")
+        if words.count >= 3 {
+            let unique = Set(words)
+            if unique.count == 1 { return true }
+        }
+        
+        // Very short with moderate no-speech probability
+        if trimmed.count < 5 && noSpeechProb > 0.3 { return true }
+        
+        return false
     }
 
     // MARK: - Transcription
@@ -470,6 +564,15 @@ class KeyboardViewController: UIInputViewController {
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"model\"\r\n\r\n".data(using: .utf8)!)
         body.append("\(Config.whisperModel)\r\n".data(using: .utf8)!)
+        
+        // Language (#39)
+        let lang = selectedLanguage
+        if lang != "auto" && !lang.isEmpty {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"language\"\r\n\r\n".data(using: .utf8)!)
+            body.append("\(lang)\r\n".data(using: .utf8)!)
+        }
+        
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"response_format\"\r\n\r\n".data(using: .utf8)!)
         body.append("verbose_json\r\n".data(using: .utf8)!)
@@ -509,16 +612,13 @@ class KeyboardViewController: UIInputViewController {
                     let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
                     let text = (json?["text"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
                     
-                    // Check for high no_speech probability
-                    var isLikelyNoise = false
+                    // Get no_speech_prob from segments (#39)
+                    var noSpeechProb: Double = 0
                     if let segments = json?["segments"] as? [[String: Any]], let first = segments.first {
-                        let noSpeechProb = first["no_speech_prob"] as? Double ?? 0
-                        if noSpeechProb > 0.5 {
-                            isLikelyNoise = true
-                        }
+                        noSpeechProb = first["no_speech_prob"] as? Double ?? 0
                     }
                     
-                    if text.isEmpty || isLikelyNoise || self.whisperHallucinations.contains(text.lowercased()) {
+                    if self.isHallucination(text, noSpeechProb: noSpeechProb) {
                         self.state = .error("No speech detected. Try again.")
                     } else {
                         self.textDocumentProxy.insertText(text)
@@ -527,6 +627,7 @@ class KeyboardViewController: UIInputViewController {
                         self.hintLabel.isHidden = true
                         self.activityIndicator.stopAnimating()
                         self.micButton.isEnabled = self.hasFullAccess
+                        UIAccessibility.post(notification: .announcement, argument: "Transcription complete. Text inserted.")
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             self.state = .idle
                         }
