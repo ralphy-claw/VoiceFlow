@@ -116,6 +116,7 @@ struct TranscribeView: View {
                                     .clipShape(Capsule())
                                     .foregroundStyle(Color.bitcoinOrange)
                             }
+                            .buttonStyle(.borderless)
                             .accessibilityLabel("Transcription language: \(sttSettings.languageDisplayCode)")
                             .accessibilityHint("Double-tap to change language")
                         }
@@ -290,6 +291,7 @@ struct TranscribeView: View {
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .background(Color.darkSurfaceLight)
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .contentShape(Rectangle())
                                         .textSelection(.enabled)
                                         .onTapGesture {
                                             isEditingTranscription = true
@@ -323,6 +325,7 @@ struct TranscribeView: View {
                                             .foregroundStyle(Color.bitcoinOrange)
                                             .clipShape(Capsule())
                                     }
+                                    .buttonStyle(.borderless)
                                     .accessibilityLabel("Summarize this transcription")
                                     .accessibilityHint("Switches to Summarize tab with this text")
                                     
@@ -338,6 +341,7 @@ struct TranscribeView: View {
                                             .foregroundStyle(Color.bitcoinOrange)
                                             .clipShape(Capsule())
                                     }
+                                    .buttonStyle(.borderless)
                                     .accessibilityLabel("Speak this transcription")
                                     .accessibilityHint("Switches to Speak tab")
                                 }
@@ -372,6 +376,7 @@ struct TranscribeView: View {
                                 }
                                 .font(.caption)
                                 .foregroundStyle(Color.bitcoinOrange)
+                                .buttonStyle(.borderless)
                                 
                                 Spacer()
                                 
@@ -387,6 +392,7 @@ struct TranscribeView: View {
                                 .font(.caption.bold())
                                 .foregroundStyle(.red)
                                 .disabled(selectedRecordIDs.isEmpty)
+                                .buttonStyle(.borderless)
                                 
                                 Button("Export") {
                                     exportSelectedRecords()
@@ -394,6 +400,7 @@ struct TranscribeView: View {
                                 .font(.caption.bold())
                                 .foregroundStyle(Color.bitcoinOrange)
                                 .disabled(selectedRecordIDs.isEmpty)
+                                .buttonStyle(.borderless)
                             }
                             .padding(.vertical, 4)
                             .listRowBackground(Color.darkSurface)
@@ -421,6 +428,17 @@ struct TranscribeView: View {
                                             isExpanded: expandedRecordID == record.id,
                                             isEditing: editingRecordID == record.id,
                                             editText: editingRecordID == record.id ? $editText : .constant(""),
+                                            onToggle: {
+                                                if isMultiSelectMode {
+                                                    if selectedRecordIDs.contains(record.id) {
+                                                        selectedRecordIDs.remove(record.id)
+                                                    } else {
+                                                        selectedRecordIDs.insert(record.id)
+                                                    }
+                                                } else if editingRecordID != record.id {
+                                                    expandedRecordID = expandedRecordID == record.id ? nil : record.id
+                                                }
+                                            },
                                             onCopy: {
                                                 UIPasteboard.general.string = record.displayText
                                                 HapticService.notification(.success)
@@ -446,18 +464,6 @@ struct TranscribeView: View {
                                                 selectedTab = 1
                                             }
                                         )
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            if isMultiSelectMode {
-                                                if selectedRecordIDs.contains(record.id) {
-                                                    selectedRecordIDs.remove(record.id)
-                                                } else {
-                                                    selectedRecordIDs.insert(record.id)
-                                                }
-                                            } else if editingRecordID != record.id {
-                                                expandedRecordID = expandedRecordID == record.id ? nil : record.id
-                                            }
-                                        }
                                     }
                                     .listRowBackground(Color.darkSurface)
                                 }
@@ -718,6 +724,7 @@ private struct TranscriptionHistoryRow: View {
     let isExpanded: Bool
     var isEditing: Bool = false
     @Binding var editText: String
+    var onToggle: () -> Void = {}
     var onCopy: () -> Void = {}
     var onEdit: () -> Void = {}
     var onSummarize: () -> Void = {} // #43
@@ -725,27 +732,32 @@ private struct TranscriptionHistoryRow: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top) {
-                Image(systemName: iconName)
-                    .foregroundStyle(Color.bitcoinOrange)
-                    .font(.caption)
-                Text(record.displayText)
-                    .lineLimit(isExpanded ? nil : 2)
-                Spacer()
-                if let lang = record.language, lang != "auto" {
-                    Text(lang.uppercased())
-                        .font(.caption2.monospaced())
-                        .foregroundStyle(.secondary)
+            // Header area — tappable for expand/collapse
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .top) {
+                    Image(systemName: iconName)
+                        .foregroundStyle(Color.bitcoinOrange)
+                        .font(.caption)
+                    Text(record.displayText)
+                        .lineLimit(isExpanded ? nil : 2)
+                    Spacer()
+                    if let lang = record.language, lang != "auto" {
+                        Text(lang.uppercased())
+                            .font(.caption2.monospaced())
+                            .foregroundStyle(.secondary)
+                    }
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
                 }
-                Image(systemName: "chevron.right")
+                
+                Text(record.timestamp, style: .relative)
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
-                    .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                    .foregroundStyle(.secondary)
             }
-            
-            Text(record.timestamp, style: .relative)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+            .contentShape(Rectangle())
+            .onTapGesture { onToggle() }
             
             if isExpanded {
                 Divider()
@@ -776,7 +788,7 @@ private struct TranscriptionHistoryRow: View {
                             .font(.title3)
                             .foregroundStyle(Color.bitcoinOrange)
                     }
-                    .buttonStyle(ScaleButtonStyle())
+                    .buttonStyle(.borderless)
                     .accessibilityLabel("Copy text")
                     
                     Button { onEdit() } label: {
@@ -784,7 +796,7 @@ private struct TranscriptionHistoryRow: View {
                             .font(.title3)
                             .foregroundStyle(isEditing ? .green : Color.bitcoinOrange)
                     }
-                    .buttonStyle(ScaleButtonStyle())
+                    .buttonStyle(.borderless)
                     .accessibilityLabel(isEditing ? "Save edit" : "Edit text")
                     
                     // #43 — Action buttons
@@ -793,7 +805,7 @@ private struct TranscriptionHistoryRow: View {
                             .font(.title3)
                             .foregroundStyle(Color.bitcoinOrange)
                     }
-                    .buttonStyle(ScaleButtonStyle())
+                    .buttonStyle(.borderless)
                     .accessibilityLabel("Summarize this text")
                     
                     Button { onSpeak() } label: {
@@ -801,7 +813,7 @@ private struct TranscriptionHistoryRow: View {
                             .font(.title3)
                             .foregroundStyle(Color.bitcoinOrange)
                     }
-                    .buttonStyle(ScaleButtonStyle())
+                    .buttonStyle(.borderless)
                     .accessibilityLabel("Speak this text")
                 }
             }
