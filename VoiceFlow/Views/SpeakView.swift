@@ -168,8 +168,10 @@ struct SpeakView: View {
                 }
             }
             .scrollContentBackground(.hidden)
-            .scrollDismissesKeyboard(.interactively)
             .background(Color.darkBackground.ignoresSafeArea())
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
             .navigationTitle("Speak")
             .toast(isShowing: $showCopyToast, message: "Copied to clipboard")
             .alert("Error", isPresented: $showError) {
@@ -298,7 +300,7 @@ private struct TTSHistoryRow: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
+            HStack(alignment: .top) {
                 Text(record.inputText)
                     .lineLimit(isExpanded ? nil : 2)
                 Spacer()

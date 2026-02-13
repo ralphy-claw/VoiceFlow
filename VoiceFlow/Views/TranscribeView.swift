@@ -333,8 +333,10 @@ struct TranscribeView: View {
                 }
             }
             .scrollContentBackground(.hidden)
-            .scrollDismissesKeyboard(.interactively)
             .background(Color.darkBackground.ignoresSafeArea())
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
             .navigationTitle("Transcribe")
             .toast(isShowing: $showCopyToast, message: "Copied to clipboard")
             .alert("Error", isPresented: $showError) {
@@ -495,7 +497,7 @@ private struct TranscriptionHistoryRow: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
+            HStack(alignment: .top) {
                 Image(systemName: iconName)
                     .foregroundStyle(Color.bitcoinOrange)
                     .font(.caption)
