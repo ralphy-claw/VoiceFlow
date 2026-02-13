@@ -8,7 +8,7 @@ class AudioPlayer: ObservableObject {
     private var player: AVAudioPlayer?
     private var playerDelegate: PlayerDelegate?
     
-    func play(data: Data) throws {
+    func play(data: Data, rate: Float = 1.0) throws {
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.playback, mode: .default)
         try session.setActive(true)
@@ -21,6 +21,8 @@ class AudioPlayer: ObservableObject {
         }
         playerDelegate = delegate
         player?.delegate = delegate
+        player?.enableRate = true
+        player?.rate = rate
         player?.play()
         isPlaying = true
     }
@@ -30,11 +32,11 @@ class AudioPlayer: ObservableObject {
         isPlaying = false
     }
     
-    func toggle(data: Data) throws {
+    func toggle(data: Data, rate: Float = 1.0) throws {
         if isPlaying {
             stop()
         } else {
-            try play(data: data)
+            try play(data: data, rate: rate)
         }
     }
 }
