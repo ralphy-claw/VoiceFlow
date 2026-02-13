@@ -98,12 +98,12 @@ struct SettingsView: View {
     private func apiKeyRow(viewModel: ProviderViewModel) -> some View {
         HStack {
             if viewModel.isRevealed {
-                TextField("Enter API Key", text: viewModel.$apiKeyInput)
+                TextField("Enter API Key", text: Binding(get: { viewModel.apiKeyInput }, set: { viewModel.apiKeyInput = $0 }))
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .font(.system(.body, design: .monospaced))
             } else {
-                SecureField("Enter API Key", text: viewModel.$apiKeyInput)
+                SecureField("Enter API Key", text: Binding(get: { viewModel.apiKeyInput }, set: { viewModel.apiKeyInput = $0 }))
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
             }
