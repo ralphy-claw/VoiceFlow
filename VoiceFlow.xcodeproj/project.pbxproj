@@ -707,7 +707,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = VoiceFlowKeyboard/VoiceFlowKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 138;
+				CURRENT_PROJECT_VERSION = 140;
 				DEVELOPMENT_TEAM = 79NK8S894T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VoiceFlowKeyboard/Info.plist;
@@ -733,7 +733,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = VoiceFlowKeyboard/VoiceFlowKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 138;
+				CURRENT_PROJECT_VERSION = 140;
 				DEVELOPMENT_TEAM = 79NK8S894T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VoiceFlowKeyboard/Info.plist;
