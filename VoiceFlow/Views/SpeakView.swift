@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct SpeakView: View {
+    @Environment(ThemeManager.self) private var theme
     @Binding var sharedText: SharedDataHandler.SharedTextData?
     @Binding var prefilledText: String
     
@@ -427,5 +428,7 @@ private struct TTSHistoryRow: View {
 
 #Preview {
     SpeakView(sharedText: .constant(nil), prefilledText: .constant(""))
+        
+        .environment(ThemeManager.shared)
         .preferredColorScheme(.dark)
 }

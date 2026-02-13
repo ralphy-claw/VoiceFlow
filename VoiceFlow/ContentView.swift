@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(ThemeManager.self) private var theme
     @Binding var selectedTab: Int
     @Binding var sharedTextData: SharedDataHandler.SharedTextData?
     @Binding var sharedAudioData: SharedDataHandler.SharedAudioData?
@@ -80,5 +81,6 @@ struct ContentView: View {
         summarizePrefilledText: .constant(""),
         speakPrefilledText: .constant("")
     )
+    .environment(ThemeManager.shared)
     .preferredColorScheme(.dark)
 }

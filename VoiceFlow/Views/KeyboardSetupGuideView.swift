@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct KeyboardSetupGuideView: View {
+    @Environment(ThemeManager.self) private var theme
     @Environment(\.dismiss) private var dismiss
     @State private var currentStep = 0
 
@@ -128,5 +129,7 @@ struct KeyboardSetupGuideView: View {
 
 #Preview {
     KeyboardSetupGuideView()
+        
+        .environment(ThemeManager.shared)
         .preferredColorScheme(.dark)
 }

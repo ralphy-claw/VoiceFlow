@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Full-screen first-launch keyboard onboarding flow (#38).
 struct KeyboardOnboardingView: View {
+    @Environment(ThemeManager.self) private var theme
     @Binding var isPresented: Bool
     @State private var currentStep = 0
     @State private var isCheckingKeyboard = false
@@ -289,5 +290,7 @@ struct KeyboardSetupBanner: View {
 
 #Preview {
     KeyboardOnboardingView(isPresented: .constant(true))
+        
+        .environment(ThemeManager.shared)
         .preferredColorScheme(.dark)
 }

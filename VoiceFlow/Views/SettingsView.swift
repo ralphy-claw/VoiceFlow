@@ -7,8 +7,8 @@ struct SettingsView: View {
     @State private var sttSettings = STTSettings()
     @State private var summarizeSettings = SummarizeSettings()
     @State private var showKeyboardSetup = false
-    private var theme = ThemeManager.shared
-    @AppStorage("geminiAPIKey") private var geminiAPIKey = ""
+    @Environment(ThemeManager.self) private var theme
+    @State private var geminiAPIKey = ""
     
     var body: some View {
         NavigationStack {
@@ -107,6 +107,10 @@ struct SettingsView: View {
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .font(.system(.body, design: .monospaced))
+                            .onAppear { geminiAPIKey = KeychainService.read(key: "geminiAPIKey") ?? "" }
+                            .onChange(of: geminiAPIKey) { _, newValue in
+                                try? KeychainService.save(key: "geminiAPIKey", value: newValue)
+                            }
                     }
                     .listRowBackground(Color.darkSurface)
                 } header: {
@@ -412,5 +416,7 @@ struct APIKeyOnboardingView: View {
 
 #Preview {
     SettingsView()
+        
+        .environment(ThemeManager.shared)
         .preferredColorScheme(.dark)
 }

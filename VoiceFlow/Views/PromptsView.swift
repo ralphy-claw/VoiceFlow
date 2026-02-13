@@ -1,7 +1,9 @@
 import SwiftUI
 import SwiftData
+import Photos
 
 struct PromptsView: View {
+    @Environment(ThemeManager.self) private var theme
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \PromptRecord.timestamp, order: .reverse) private var history: [PromptRecord]
     @StateObject private var recorder = AudioRecorder()
@@ -16,6 +18,7 @@ struct PromptsView: View {
     @State private var errorMessage: String?
     @State private var showError = false
     @State private var showCopyToast = false
+    @State private var showSaveToast = false
 
     // Image generation
     @State private var isGeneratingImage = false
@@ -156,6 +159,19 @@ struct PromptsView: View {
                     VStack {
                         Spacer()
                         Text("Copied!")
+                            .font(.subheadline.weight(.medium))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial, in: Capsule())
+                            .padding(.bottom, 32)
+                    }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .allowsHitTesting(false)
+                }
+                if showSaveToast {
+                    VStack {
+                        Spacer()
+                        Text("Saved to Photos!")
                             .font(.subheadline.weight(.medium))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -415,11 +431,7 @@ struct PromptsView: View {
                     
                     Button {
                         HapticService.impact(.light)
-                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-                        withAnimation { showCopyToast = true }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            withAnimation { showCopyToast = false }
-                        }
+                        saveImageToPhotos(image)
                     } label: {
                         Label("Save to Photos", systemImage: "square.and.arrow.down")
                             .font(.subheadline.weight(.medium))
@@ -564,6 +576,29 @@ struct PromptsView: View {
         HapticService.notification(.success)
         resetCreator()
         showCreator = false
+    }
+
+    private func saveImageToPhotos(_ image: UIImage) {
+        Task {
+            do {
+                try await PHPhotoLibrary.shared().performChanges {
+                    PHAssetChangeRequest.creationRequestForAsset(from: image)
+                }
+                await MainActor.run {
+                    withAnimation { showSaveToast = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        withAnimation { showSaveToast = false }
+                    }
+                    HapticService.notification(.success)
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = "Failed to save image: \(error.localizedDescription)"
+                    showError = true
+                    HapticService.notification(.error)
+                }
+            }
+        }
     }
 
     private func generateImage(from prompt: String) {
@@ -792,5 +827,7 @@ struct PromptDetailView: View {
 
 #Preview {
     PromptsView()
+        
+        .environment(ThemeManager.shared)
         .preferredColorScheme(.dark)
 }

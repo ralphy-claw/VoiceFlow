@@ -18,6 +18,7 @@ struct VoiceFlowApp: App {
                 summarizePrefilledText: $summarizePrefilledText,
                 speakPrefilledText: $speakPrefilledText
             )
+            .environment(ThemeManager.shared)
             .preferredColorScheme(.dark)
             .onOpenURL { url in
                 handleDeepLink(url)

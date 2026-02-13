@@ -15,7 +15,7 @@ enum ThemePreset: String, CaseIterable, Identifiable {
         switch self {
         case .bitcoinOrange:
             return (
-                Color(red: 242/255, green: 169/255, blue: 0/255),
+                Color(red: 247/255, green: 147/255, blue: 26/255),
                 Color(red: 13/255, green: 13/255, blue: 13/255),
                 Color(red: 26/255, green: 26/255, blue: 30/255),
                 Color.white
@@ -73,16 +73,15 @@ final class ThemeManager {
     var selectedPreset: ThemePreset {
         didSet {
             UserDefaults.standard.set(selectedPreset.rawValue, forKey: "selectedThemePreset")
-            if selectedPreset != .custom {
+            if selectedPreset == .custom {
+                accentColor = Self.loadColor(key: "customAccent") ?? accentColor
+                backgroundColor = Self.loadColor(key: "customBackground") ?? backgroundColor
+                surfaceColor = Self.loadColor(key: "customSurface") ?? surfaceColor
+                textColor = Self.loadColor(key: "customText") ?? textColor
+            } else {
                 applyPreset(selectedPreset)
             }
         }
-    }
-    
-    // Surface light is derived from surface
-    var surfaceLightColor: Color {
-        // Slightly lighter than surface
-        surfaceColor.opacity(1) // We'll blend
     }
     
     init() {

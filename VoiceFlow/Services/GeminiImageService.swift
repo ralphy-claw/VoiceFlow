@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import Foundation
 
 @Observable
 final class GeminiImageService {
@@ -10,7 +11,7 @@ final class GeminiImageService {
     var errorMessage: String?
     
     func generateImage(prompt: String) async throws -> UIImage {
-        let apiKey = UserDefaults.standard.string(forKey: "geminiAPIKey") ?? ""
+        let apiKey = KeychainService.read(key: "geminiAPIKey") ?? ""
         guard !apiKey.isEmpty else {
             throw GeminiError.noAPIKey
         }
