@@ -88,6 +88,7 @@ struct SettingsView: View {
             }
             .scrollContentBackground(.hidden)
             .background(Color.darkBackground)
+            .contentMargins(.bottom, 32, for: .scrollContent)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
         }
@@ -113,6 +114,8 @@ struct SettingsView: View {
             } label: {
                 Image(systemName: viewModel.isRevealed ? "eye.slash" : "eye")
                     .foregroundColor(.bitcoinOrange)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         }

@@ -117,15 +117,25 @@ struct SpeakView: View {
                             }
                         }
                         
-                        HStack {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Speed:")
                                 .font(.subheadline)
-                            Picker("Playback Speed", selection: $playbackSpeed) {
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
                                 ForEach(speeds, id: \.self) { speed in
-                                    Text("\(String(format: "%.2f", speed))x").tag(speed)
+                                    Button {
+                                        playbackSpeed = speed
+                                        HapticService.impact(.light)
+                                    } label: {
+                                        Text("\(String(format: "%.2g", speed))x")
+                                            .font(.subheadline.weight(playbackSpeed == speed ? .bold : .regular))
+                                            .frame(maxWidth: .infinity, minHeight: 44)
+                                            .background(playbackSpeed == speed ? Color.bitcoinOrange : Color.darkSurfaceLight)
+                                            .foregroundStyle(playbackSpeed == speed ? .white : .primary)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    }
+                                    .buttonStyle(.plain)
                                 }
                             }
-                            .pickerStyle(.segmented)
                         }
                         
                         Button {
@@ -141,6 +151,7 @@ struct SpeakView: View {
                             }
                         }
                         .buttonStyle(.borderedProminent)
+                        .frame(minHeight: 56)
                         .tint(.bitcoinOrange)
                         .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isGenerating)
                         

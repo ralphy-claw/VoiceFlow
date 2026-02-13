@@ -103,6 +103,7 @@ struct SummarizeView: View {
                             }
                         }
                         .buttonStyle(.borderedProminent)
+                        .frame(minHeight: 56)
                         .tint(.bitcoinOrange)
                         .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSummarizing)
                         

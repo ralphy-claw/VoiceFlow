@@ -20,7 +20,7 @@ enum SummaryLength: String, CaseIterable, Codable {
 enum SummaryFormat: String, CaseIterable, Codable {
     case prose = "Prose"
     case bullets = "Bullets"
-    case keyTakeaways = "Key Takeaways"
+    case keyTakeaways = "Takeaways"
     
     var systemPrompt: String {
         switch self {

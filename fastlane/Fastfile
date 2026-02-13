@@ -7,16 +7,55 @@ platform :ios do
   lane :beta do |options|
     build_number = (sh("git rev-list --count HEAD", log: false).strip.to_i + 100).to_s
 
+    api_key = app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_VOICEFLOW_ID"] || "CPWGH6B5H6",
+      issuer_id: ENV["ASC_KEY_VOICEFLOW_ISSUER_ID"] || "e576b7d5-3c0e-4d7d-ae33-294c6639571a",
+      key_filepath: ENV["ASC_KEY_VOICEFLOW_FILEPATH"] || "/Users/ralphy-claw/.openclaw/workspace/projects/Pixella/fastlane/AuthKey_PIXELLA.p8",
+      duration: 1200,
+      in_house: false
+    )
+
+    # Unlock match keychain for codesigning (distribution cert lives here)
+    keychain_path = File.expand_path("~/Library/Keychains/match_certificates-db")
+    if File.exist?(keychain_path)
+      unlock_keychain(
+        path: keychain_path,
+        password: ENV["MATCH_KEYCHAIN_PASSWORD"],
+        set_default: false
+      )
+    end
+
+    # Use match to install the distribution cert only (skip provisioning profiles)
+    match(
+      type: "appstore",
+      app_identifier: ["com.lubodev.voiceflow", "com.lubodev.voiceflow.keyboard"],
+      team_id: "79NK8S894T",
+      git_branch: "certificates",
+      readonly: false,
+      git_url: ENV["MATCH_GIT_URL"] || "https://github.com/ralphy-claw/Pixella.git"
+    )
+
+    increment_build_number(
+      build_number: build_number,
+      xcodeproj: "VoiceFlow.xcodeproj"
+    )
+
+    key_path = ENV["ASC_KEY_VOICEFLOW_FILEPATH"] || "/Users/ralphy-claw/.openclaw/workspace/projects/Pixella/fastlane/AuthKey_PIXELLA.p8"
+    key_id = ENV["ASC_KEY_VOICEFLOW_ID"] || "CPWGH6B5H6"
+    key_issuer = ENV["ASC_KEY_VOICEFLOW_ISSUER_ID"] || "e576b7d5-3c0e-4d7d-ae33-294c6639571a"
+
     gym(
       scheme: "VoiceFlow",
       configuration: "Release",
       export_method: "app-store",
       output_directory: "./build",
       output_name: "VoiceFlow.ipa",
-      clean: true
+      clean: true,
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath '#{key_path}' -authenticationKeyID #{key_id} -authenticationKeyIssuerID #{key_issuer}"
     )
 
     pilot(
+      api_key: api_key,
       app_identifier: "com.lubodev.voiceflow",
       team_id: "79NK8S894T",
       skip_waiting_for_build_processing: true,
