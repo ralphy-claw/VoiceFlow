@@ -16,7 +16,7 @@ final class GeminiImageService {
             throw GeminiError.noAPIKey
         }
         
-        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=\(apiKey)"
+        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=\(apiKey)"
         guard let url = URL(string: urlString) else {
             throw GeminiError.invalidURL
         }
