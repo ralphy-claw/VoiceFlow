@@ -26,7 +26,8 @@ struct VoiceFlowApp: App {
         .modelContainer(for: [
             TranscriptionRecord.self,
             TTSRecord.self,
-            SummaryRecord.self
+            SummaryRecord.self,
+            PromptRecord.self
         ])
     }
     

@@ -36,11 +36,17 @@ struct ContentView: View {
                 }
                 .tag(2)
             
+            PromptsView()
+                .tabItem {
+                    Label("Prompts", systemImage: "sparkles.rectangle.stack")
+                }
+                .tag(3)
+            
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gearshape.fill")
                 }
-                .tag(3)
+                .tag(4)
         }
         .tint(.bitcoinOrange)
         .onAppear {
