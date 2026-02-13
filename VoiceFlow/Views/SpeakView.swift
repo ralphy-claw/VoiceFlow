@@ -9,21 +9,20 @@ struct SpeakView: View {
     @State private var inputText = ""
     @State private var selectedProvider: TTSProvider = .openai
     @State private var selectedVoice = "alloy"
-    @State private var selectedElevenLabsVoice = "21m00Tcm4TlvDq8ikWAM" // Rachel (default)
+    @State private var selectedElevenLabsVoice = "21m00Tcm4TlvDq8ikWAM"
     @State private var elevenLabsVoices: [ElevenLabsVoice] = []
-    @State private var playbackSpeed: Float = 1.0
     @State private var isGenerating = false
     @State private var audioData: Data?
     @State private var errorMessage: String?
     @State private var showError = false
-    @StateObject private var player = AudioPlayer()
     @State private var expandedRecordID: UUID?
     @State private var showShareSheet = false
     @State private var shareURL: URL?
     @State private var showCopyToast = false
+    @State private var showPlaybackBar = false
+    @StateObject private var playbackVM = AudioPlaybackViewModel()
     
     private let voices = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
-    private let speeds: [Float] = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0]
     
     enum TTSProvider: String, CaseIterable {
         case openai = "OpenAI"
@@ -117,77 +116,38 @@ struct SpeakView: View {
                             }
                         }
                         
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Speed:")
-                                .font(.subheadline)
-                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
-                                ForEach(speeds, id: \.self) { speed in
-                                    Button {
-                                        playbackSpeed = speed
-                                        HapticService.impact(.light)
-                                    } label: {
-                                        Text("\(String(format: "%.2g", speed))x")
-                                            .font(.subheadline.weight(playbackSpeed == speed ? .bold : .regular))
-                                            .frame(maxWidth: .infinity, minHeight: 44)
-                                            .background(playbackSpeed == speed ? Color.bitcoinOrange : Color.darkSurfaceLight)
-                                            .foregroundStyle(playbackSpeed == speed ? .white : .primary)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        }
-                        
-                        Button {
+                        PremiumButton(
+                            title: "Generate Speech",
+                            icon: "waveform",
+                            isLoading: isGenerating,
+                            isDisabled: inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                        ) {
                             generateSpeech()
-                        } label: {
-                            if isGenerating {
-                                ProgressView()
-                                    .tint(.white)
-                                    .frame(maxWidth: .infinity)
-                            } else {
-                                Label("Generate Speech", systemImage: "waveform")
-                                    .frame(maxWidth: .infinity)
-                            }
                         }
-                        .buttonStyle(.borderedProminent)
-                        .frame(minHeight: 56)
-                        .tint(.bitcoinOrange)
-                        .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isGenerating)
                         
-                        if audioData != nil {
-                            HStack(spacing: 16) {
-                                Button {
-                                    togglePlayback()
-                                } label: {
-                                    Label(player.isPlaying ? "Stop" : "Play", systemImage: player.isPlaying ? "stop.fill" : "play.fill")
-                                        .font(.title3)
-                                }
-                                .buttonStyle(.bordered)
-                                .tint(.bitcoinOrange)
-                                
-                                Button {
-                                    shareAudio()
-                                } label: {
-                                    Label("Export", systemImage: "square.and.arrow.up")
-                                        .font(.title3)
-                                }
-                                .buttonStyle(.bordered)
-                                .tint(.bitcoinOrange)
-                            }
+                        if showPlaybackBar {
+                            AudioPlaybackBar(
+                                viewModel: playbackVM,
+                                onShare: { shareAudio() }
+                            )
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                     }
                     .padding(.vertical, 8)
                     .listRowBackground(Color.darkSurface)
+                } header: {
+                    SectionHeader(icon: "speaker.wave.2.fill", title: "Text to Speech")
                 }
                 
                 // MARK: - History Section
                 Section {
                     if history.isEmpty {
-                        Text("No history yet")
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity)
-                            .listRowBackground(Color.darkSurface)
+                        EmptyStateView(
+                            icon: "speaker.slash",
+                            title: "No History Yet",
+                            subtitle: "Generated speech will appear here"
+                        )
+                        .listRowBackground(Color.darkSurface)
                     } else {
                         ForEach(history) { record in
                             TTSHistoryRow(record: record, isExpanded: expandedRecordID == record.id)
@@ -202,7 +162,7 @@ struct SpeakView: View {
                         .onDelete(perform: deleteRecords)
                     }
                 } header: {
-                    Text("History")
+                    SectionHeader(icon: "clock.arrow.circlepath", title: "History")
                 }
             }
             .scrollContentBackground(.hidden)
@@ -232,7 +192,6 @@ struct SpeakView: View {
     private func deleteRecords(at offsets: IndexSet) {
         for index in offsets {
             let record = history[index]
-            // Remove stored audio file
             if let filename = record.audioFilePath {
                 let docsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
                 let fileURL = docsURL.appendingPathComponent(filename)
@@ -263,6 +222,10 @@ struct SpeakView: View {
                 }
                 
                 audioData = data
+                try playbackVM.load(data: data)
+                withAnimation(.spring(duration: 0.4)) {
+                    showPlaybackBar = true
+                }
                 HapticService.notification(.success)
                 let filename = "\(UUID().uuidString).mp3"
                 let docsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -295,21 +258,8 @@ struct SpeakView: View {
         }
     }
     
-    private func togglePlayback() {
-        guard let data = audioData else { return }
-        HapticService.impact(.light)
-        do {
-            try player.toggle(data: data, rate: playbackSpeed)
-        } catch {
-            errorMessage = error.localizedDescription
-            showError = true
-        }
-    }
-    
     private func shareAudio() {
         guard let data = audioData else { return }
-        
-        // Create temporary file
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("voiceflow_tts.mp3")
         do {
             try data.write(to: tempURL)
@@ -371,18 +321,20 @@ private struct TTSHistoryRow: View {
                     Button {
                         replayAudio()
                     } label: {
-                        Label(player.isPlaying ? "Stop" : "Replay", systemImage: player.isPlaying ? "stop.fill" : "play.fill")
-                            .font(.caption)
+                        Image(systemName: player.isPlaying ? "stop.circle.fill" : "play.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(Color.bitcoinOrange)
                     }
-                    .tint(.bitcoinOrange)
+                    .buttonStyle(ScaleButtonStyle())
                     
                     Button {
                         UIPasteboard.general.string = record.inputText
                     } label: {
-                        Label("Copy", systemImage: "doc.on.doc")
-                            .font(.caption)
+                        Image(systemName: "doc.on.doc.fill")
+                            .font(.title3)
+                            .foregroundStyle(Color.bitcoinOrange)
                     }
-                    .tint(.bitcoinOrange)
+                    .buttonStyle(ScaleButtonStyle())
                 }
             }
         }
