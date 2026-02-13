@@ -116,6 +116,7 @@ class STTSettings {
     
     private let providerKey = "stt_provider"
     private let languageKey = "stt_language"
+    private let appGroupID = "group.com.lubodev.voiceflow"
     
     init() {
         if let providerRaw = UserDefaults.standard.string(forKey: providerKey),
@@ -133,6 +134,8 @@ class STTSettings {
     
     private func saveLanguage() {
         UserDefaults.standard.set(language, forKey: languageKey)
+        // Sync to App Group for keyboard extension (#39)
+        UserDefaults(suiteName: appGroupID)?.set(language, forKey: languageKey)
     }
     
     /// Display code for the current language (e.g. "EN", "BG", "AUTO")

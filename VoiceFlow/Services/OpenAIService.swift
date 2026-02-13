@@ -42,7 +42,7 @@ actor OpenAIService {
         
         request.httpBody = body
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.resilientData(for: request, maxRetries: 3, timeoutInterval: 60)
         guard let http = response as? HTTPURLResponse else { throw OpenAIError.invalidResponse }
         
         if http.statusCode != 200 {
@@ -69,7 +69,7 @@ actor OpenAIService {
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: payload)
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.resilientData(for: request, maxRetries: 3, timeoutInterval: 30)
         guard let http = response as? HTTPURLResponse else { throw OpenAIError.invalidResponse }
         
         if http.statusCode != 200 {
@@ -99,7 +99,7 @@ actor OpenAIService {
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: payload)
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.resilientData(for: request, maxRetries: 3, timeoutInterval: 30)
         guard let http = response as? HTTPURLResponse else { throw OpenAIError.invalidResponse }
         
         if http.statusCode != 200 {

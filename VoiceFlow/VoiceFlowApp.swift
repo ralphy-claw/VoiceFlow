@@ -6,13 +6,15 @@ struct VoiceFlowApp: App {
     @State private var selectedTab = 0
     @State private var sharedTextData: SharedDataHandler.SharedTextData?
     @State private var sharedAudioData: SharedDataHandler.SharedAudioData?
+    @State private var summarizePrefilledText = ""
     
     var body: some Scene {
         WindowGroup {
             ContentView(
                 selectedTab: $selectedTab,
                 sharedTextData: $sharedTextData,
-                sharedAudioData: $sharedAudioData
+                sharedAudioData: $sharedAudioData,
+                summarizePrefilledText: $summarizePrefilledText
             )
             .preferredColorScheme(.dark)
             .onOpenURL { url in
@@ -31,26 +33,22 @@ struct VoiceFlowApp: App {
         
         switch url.host {
         case "share":
-            // Handle share extension data
             if let data = SharedDataHandler.readSharedText() {
                 sharedTextData = data
-                
-                // Navigate to appropriate tab
                 switch data.action {
                 case "tts":
-                    selectedTab = 1 // Speak tab
+                    selectedTab = 1
                 case "summarize":
-                    selectedTab = 2 // Summarize tab
+                    selectedTab = 2
                 default:
                     break
                 }
             }
             
         case "transcribe":
-            // Handle audio share
             if let data = SharedDataHandler.readSharedAudio() {
                 sharedAudioData = data
-                selectedTab = 0 // Transcribe tab
+                selectedTab = 0
             }
             
         default:

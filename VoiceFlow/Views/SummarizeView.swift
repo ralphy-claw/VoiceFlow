@@ -3,6 +3,7 @@ import SwiftData
 
 struct SummarizeView: View {
     @Binding var sharedText: SharedDataHandler.SharedTextData?
+    @Binding var prefilledText: String
     
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \SummaryRecord.timestamp, order: .reverse) private var history: [SummaryRecord]
@@ -98,6 +99,8 @@ struct SummarizeView: View {
                         ) {
                             summarize()
                         }
+                        .accessibilityLabel("Summarize text")
+                        .accessibilityHint("Double-tap to generate a summary of the entered text")
                         
                         if !summary.isEmpty {
                             VStack(alignment: .leading, spacing: 8) {
@@ -213,6 +216,12 @@ struct SummarizeView: View {
                     inputText = data.text
                     SharedDataHandler.clearSharedText()
                     sharedText = nil
+                }
+            }
+            .onChange(of: prefilledText) { _, newText in
+                if !newText.isEmpty {
+                    inputText = newText
+                    prefilledText = ""
                 }
             }
         }
@@ -331,6 +340,6 @@ private struct SummaryHistoryRow: View {
 }
 
 #Preview {
-    SummarizeView(sharedText: .constant(nil))
+    SummarizeView(sharedText: .constant(nil), prefilledText: .constant(""))
         .preferredColorScheme(.dark)
 }

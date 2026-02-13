@@ -4,12 +4,19 @@ struct ContentView: View {
     @Binding var selectedTab: Int
     @Binding var sharedTextData: SharedDataHandler.SharedTextData?
     @Binding var sharedAudioData: SharedDataHandler.SharedAudioData?
+    @Binding var summarizePrefilledText: String
     
     @State private var showOnboarding = false
+    @State private var showKeyboardOnboarding = false
+    @State private var showKeyboardSetup = false
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            TranscribeView(sharedAudioData: $sharedAudioData)
+            TranscribeView(
+                sharedAudioData: $sharedAudioData,
+                selectedTab: $selectedTab,
+                summarizePrefilledText: $summarizePrefilledText
+            )
                 .tabItem {
                     Label("Transcribe", systemImage: "mic.fill")
                 }
@@ -21,7 +28,7 @@ struct ContentView: View {
                 }
                 .tag(1)
             
-            SummarizeView(sharedText: $sharedTextData)
+            SummarizeView(sharedText: $sharedTextData, prefilledText: $summarizePrefilledText)
                 .tabItem {
                     Label("Summarize", systemImage: "doc.text.fill")
                 }
@@ -39,14 +46,30 @@ struct ContentView: View {
             if !provider.hasKey {
                 showOnboarding = true
             }
+            
+            // Show keyboard onboarding on first launch
+            if !UserDefaults.standard.bool(forKey: "hasCompletedKeyboardOnboarding") {
+                showKeyboardOnboarding = true
+            }
         }
         .sheet(isPresented: $showOnboarding) {
             APIKeyOnboardingView(isPresented: $showOnboarding)
+        }
+        .fullScreenCover(isPresented: $showKeyboardOnboarding) {
+            KeyboardOnboardingView(isPresented: $showKeyboardOnboarding)
+        }
+        .sheet(isPresented: $showKeyboardSetup) {
+            KeyboardSetupGuideView()
         }
     }
 }
 
 #Preview {
-    ContentView(selectedTab: .constant(0), sharedTextData: .constant(nil), sharedAudioData: .constant(nil))
-        .preferredColorScheme(.dark)
+    ContentView(
+        selectedTab: .constant(0),
+        sharedTextData: .constant(nil),
+        sharedAudioData: .constant(nil),
+        summarizePrefilledText: .constant("")
+    )
+    .preferredColorScheme(.dark)
 }
