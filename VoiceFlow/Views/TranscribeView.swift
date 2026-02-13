@@ -28,21 +28,28 @@ struct TranscribeView: View {
                             Button {
                                 handleRecord()
                             } label: {
-                                VStack {
-                                    Image(systemName: recorder.isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                                        .font(.system(size: 60))
-                                        .foregroundStyle(recorder.isRecording ? Color.red : Color.bitcoinOrange)
+                                VStack(spacing: 8) {
+                                    ZStack {
+                                        Image(systemName: recorder.isRecording ? "stop.circle.fill" : "mic.circle.fill")
+                                            .font(.system(size: 60))
+                                            .foregroundStyle(recorder.isRecording ? Color.red : Color.bitcoinOrange)
+                                        
+                                        if recorder.isRecording {
+                                            RecordingIndicator(isRecording: true)
+                                                .offset(x: 24, y: -24)
+                                        }
+                                    }
                                     Text(recorder.isRecording ? "Stop" : "Record")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(ScaleButtonStyle())
                             
                             Button {
                                 showFilePicker = true
                             } label: {
-                                VStack {
+                                VStack(spacing: 8) {
                                     Image(systemName: "doc.badge.plus")
                                         .font(.system(size: 50))
                                         .foregroundStyle(Color.bitcoinOrange)
@@ -51,7 +58,7 @@ struct TranscribeView: View {
                                         .foregroundStyle(.secondary)
                                 }
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(ScaleButtonStyle())
                             .disabled(isTranscribing)
                         }
                         .frame(maxWidth: .infinity)
@@ -89,19 +96,27 @@ struct TranscribeView: View {
                                             showCopyToast = true
                                         }
                                     } label: {
-                                        Label("Copy", systemImage: "doc.on.doc")
-                                            .font(.caption)
+                                        Image(systemName: "doc.on.doc.fill")
+                                            .font(.body)
+                                            .foregroundStyle(Color.bitcoinOrange)
+                                            .frame(width: 36, height: 36)
+                                            .background(Color.darkSurfaceLight)
+                                            .clipShape(Circle())
                                     }
-                                    .tint(.bitcoinOrange)
+                                    .buttonStyle(ScaleButtonStyle())
                                     
                                     Button {
                                         transcription = ""
                                         HapticService.impact(.light)
                                     } label: {
-                                        Label("Clear", systemImage: "trash")
-                                            .font(.caption)
+                                        Image(systemName: "trash.fill")
+                                            .font(.body)
+                                            .foregroundStyle(.red)
+                                            .frame(width: 36, height: 36)
+                                            .background(Color.darkSurfaceLight)
+                                            .clipShape(Circle())
                                     }
-                                    .tint(.red)
+                                    .buttonStyle(ScaleButtonStyle())
                                 }
                                 
                                 Text(transcription)
@@ -133,15 +148,22 @@ struct TranscribeView: View {
                     }
                     .padding(.vertical, 8)
                     .listRowBackground(Color.darkSurface)
+                } header: {
+                    SectionHeader(icon: "mic.fill", title: "Voice to Text")
                 }
                 
                 // MARK: - History Section
                 Section {
                     if history.isEmpty {
-                        Text("No history yet")
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity)
-                            .listRowBackground(Color.darkSurface)
+                        EmptyStateView(
+                            icon: "clock.arrow.circlepath",
+                            title: "No History Yet",
+                            subtitle: "Your transcriptions will appear here",
+                            ctaTitle: "Start Recording",
+                            ctaIcon: "mic.fill",
+                            ctaAction: { handleRecord() }
+                        )
+                        .listRowBackground(Color.darkSurface)
                     } else {
                         ForEach(history) { record in
                             TranscriptionHistoryRow(record: record, isExpanded: expandedRecordID == record.id)
@@ -156,7 +178,7 @@ struct TranscribeView: View {
                         .onDelete(perform: deleteRecords)
                     }
                 } header: {
-                    Text("History")
+                    SectionHeader(icon: "clock.arrow.circlepath", title: "History")
                 }
             }
             .scrollContentBackground(.hidden)
@@ -250,7 +272,6 @@ struct TranscribeView: View {
     
     private func handleSharedAudio(_ data: SharedDataHandler.SharedAudioData) {
         transcribeFile(at: data.fileURL, sourceType: "share", duration: nil)
-        // Clean up shared data
         SharedDataHandler.clearSharedAudio()
     }
 }
@@ -285,10 +306,11 @@ private struct TranscriptionHistoryRow: View {
                 Button {
                     UIPasteboard.general.string = record.transcribedText
                 } label: {
-                    Label("Copy", systemImage: "doc.on.doc")
-                        .font(.caption)
+                    Image(systemName: "doc.on.doc.fill")
+                        .font(.title3)
+                        .foregroundStyle(Color.bitcoinOrange)
                 }
-                .tint(.bitcoinOrange)
+                .buttonStyle(ScaleButtonStyle())
             }
         }
         .padding(.vertical, 4)

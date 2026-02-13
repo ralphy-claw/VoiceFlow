@@ -90,22 +90,14 @@ struct SummarizeView: View {
                             .pickerStyle(.segmented)
                         }
                         
-                        Button {
+                        PremiumButton(
+                            title: "Summarize",
+                            icon: "sparkles",
+                            isLoading: isSummarizing,
+                            isDisabled: inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                        ) {
                             summarize()
-                        } label: {
-                            if isSummarizing {
-                                ProgressView()
-                                    .tint(.white)
-                                    .frame(maxWidth: .infinity)
-                            } else {
-                                Label("Summarize", systemImage: "sparkles")
-                                    .frame(maxWidth: .infinity)
-                            }
                         }
-                        .buttonStyle(.borderedProminent)
-                        .frame(minHeight: 56)
-                        .tint(.bitcoinOrange)
-                        .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSummarizing)
                         
                         if !summary.isEmpty {
                             VStack(alignment: .leading, spacing: 8) {
@@ -120,19 +112,27 @@ struct SummarizeView: View {
                                             showCopyToast = true
                                         }
                                     } label: {
-                                        Label("Copy", systemImage: "doc.on.doc")
-                                            .font(.caption)
+                                        Image(systemName: "doc.on.doc.fill")
+                                            .font(.body)
+                                            .foregroundStyle(Color.bitcoinOrange)
+                                            .frame(width: 36, height: 36)
+                                            .background(Color.darkSurfaceLight)
+                                            .clipShape(Circle())
                                     }
-                                    .tint(.bitcoinOrange)
+                                    .buttonStyle(ScaleButtonStyle())
                                     
                                     Button {
                                         summary = ""
                                         HapticService.impact(.light)
                                     } label: {
-                                        Label("Clear", systemImage: "trash")
-                                            .font(.caption)
+                                        Image(systemName: "trash.fill")
+                                            .font(.body)
+                                            .foregroundStyle(.red)
+                                            .frame(width: 36, height: 36)
+                                            .background(Color.darkSurfaceLight)
+                                            .clipShape(Circle())
                                     }
-                                    .tint(.red)
+                                    .buttonStyle(ScaleButtonStyle())
                                 }
                                 
                                 Text(summary)
@@ -164,15 +164,19 @@ struct SummarizeView: View {
                     }
                     .padding(.vertical, 8)
                     .listRowBackground(Color.darkSurface)
+                } header: {
+                    SectionHeader(icon: "sparkles", title: "Summarize")
                 }
                 
                 // MARK: - History Section
                 Section {
                     if history.isEmpty {
-                        Text("No history yet")
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity)
-                            .listRowBackground(Color.darkSurface)
+                        EmptyStateView(
+                            icon: "doc.text.magnifyingglass",
+                            title: "No Summaries Yet",
+                            subtitle: "Your summaries will appear here"
+                        )
+                        .listRowBackground(Color.darkSurface)
                     } else {
                         ForEach(history) { record in
                             SummaryHistoryRow(record: record, isExpanded: expandedRecordID == record.id)
@@ -187,7 +191,7 @@ struct SummarizeView: View {
                         .onDelete(perform: deleteRecords)
                     }
                 } header: {
-                    Text("History")
+                    SectionHeader(icon: "clock.arrow.circlepath", title: "History")
                 }
             }
             .scrollContentBackground(.hidden)
@@ -265,10 +269,11 @@ private struct SummaryHistoryRow: View {
                         Button {
                             UIPasteboard.general.string = record.inputText
                         } label: {
-                            Label("Copy", systemImage: "doc.on.doc")
-                                .font(.caption2)
+                            Image(systemName: "doc.on.doc.fill")
+                                .font(.caption)
+                                .foregroundStyle(Color.bitcoinOrange)
                         }
-                        .tint(.bitcoinOrange)
+                        .buttonStyle(ScaleButtonStyle())
                     }
                     Text(record.inputText)
                         .font(.body)
@@ -284,10 +289,11 @@ private struct SummaryHistoryRow: View {
                         Button {
                             UIPasteboard.general.string = record.summaryText
                         } label: {
-                            Label("Copy", systemImage: "doc.on.doc")
-                                .font(.caption2)
+                            Image(systemName: "doc.on.doc.fill")
+                                .font(.caption)
+                                .foregroundStyle(Color.bitcoinOrange)
                         }
-                        .tint(.bitcoinOrange)
+                        .buttonStyle(ScaleButtonStyle())
                     }
                     Text(record.summaryText)
                         .font(.body)
