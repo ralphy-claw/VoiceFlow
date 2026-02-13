@@ -23,10 +23,13 @@
 		A10007 /* TranscribeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10007 /* TranscribeView.swift */; };
 		A10008 /* SpeakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10008 /* SpeakView.swift */; };
 		A10009 /* SummarizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10009 /* SummarizeView.swift */; };
+		2D7BDE5E1B0048498D6FDADE /* PromptsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA67DD78B5C4465F82CADD77 /* PromptsView.swift */; };
 		A10010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10010 /* Assets.xcassets */; };
 		A10011 /* TranscriptionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10011 /* TranscriptionRecord.swift */; };
 		A10012 /* TTSRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10012 /* TTSRecord.swift */; };
 		A10013 /* SummaryRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10013 /* SummaryRecord.swift */; };
+		6AA83DFC4E044E8793C1FC8F /* PromptPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17AF22A0A1946BE93B87CB2 /* PromptPreset.swift */; };
+		806BB81F31B348E7A5E09B46 /* PromptRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AFFF45EE574D1BA00D8273 /* PromptRecord.swift */; };
 		A10014 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10014 /* KeychainService.swift */; };
 		A10015 /* ServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10015 /* ServiceProvider.swift */; };
 		A10016 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10016 /* SettingsView.swift */; };
@@ -118,10 +121,13 @@
 		B10007 /* TranscribeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscribeView.swift; sourceTree = "<group>"; };
 		B10008 /* SpeakView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakView.swift; sourceTree = "<group>"; };
 		B10009 /* SummarizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummarizeView.swift; sourceTree = "<group>"; };
+		BA67DD78B5C4465F82CADD77 /* PromptsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptsView.swift; sourceTree = "<group>"; };
 		B10010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B10011 /* TranscriptionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionRecord.swift; sourceTree = "<group>"; };
 		B10012 /* TTSRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSRecord.swift; sourceTree = "<group>"; };
 		B10013 /* SummaryRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryRecord.swift; sourceTree = "<group>"; };
+		B17AF22A0A1946BE93B87CB2 /* PromptPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptPreset.swift; sourceTree = "<group>"; };
+		20AFFF45EE574D1BA00D8273 /* PromptRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptRecord.swift; sourceTree = "<group>"; };
 		B10014 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		B10015 /* ServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProvider.swift; sourceTree = "<group>"; };
 		B10016 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -295,6 +301,7 @@
 				B10007 /* TranscribeView.swift */,
 				B10008 /* SpeakView.swift */,
 				B10009 /* SummarizeView.swift */,
+				BA67DD78B5C4465F82CADD77 /* PromptsView.swift */,
 				B10016 /* SettingsView.swift */,
 				B10023 /* ToastView.swift */,
 				B10037 /* LanguagePickerView.swift */,
@@ -321,6 +328,8 @@
 				B10011 /* TranscriptionRecord.swift */,
 				B10012 /* TTSRecord.swift */,
 				B10013 /* SummaryRecord.swift */,
+				B17AF22A0A1946BE93B87CB2 /* PromptPreset.swift */,
+				20AFFF45EE574D1BA00D8273 /* PromptRecord.swift */,
 				B10022 /* SummarizeSettings.swift */,
 			);
 			path = Models;
@@ -559,10 +568,13 @@
 				A10007 /* TranscribeView.swift in Sources */,
 				A10008 /* SpeakView.swift in Sources */,
 				A10009 /* SummarizeView.swift in Sources */,
+				2D7BDE5E1B0048498D6FDADE /* PromptsView.swift in Sources */,
 				611A8DCE398675FA07A0131A /* Theme.swift in Sources */,
 				A10011 /* TranscriptionRecord.swift in Sources */,
 				A10012 /* TTSRecord.swift in Sources */,
 				A10013 /* SummaryRecord.swift in Sources */,
+				6AA83DFC4E044E8793C1FC8F /* PromptPreset.swift in Sources */,
+				806BB81F31B348E7A5E09B46 /* PromptRecord.swift in Sources */,
 				A10014 /* KeychainService.swift in Sources */,
 				A10015 /* ServiceProvider.swift in Sources */,
 				A10016 /* SettingsView.swift in Sources */,
@@ -723,7 +735,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = VoiceFlowKeyboard/VoiceFlowKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 153;
+				CURRENT_PROJECT_VERSION = 155;
 				DEVELOPMENT_TEAM = 79NK8S894T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VoiceFlowKeyboard/Info.plist;
@@ -749,7 +761,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = VoiceFlowKeyboard/VoiceFlowKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 153;
+				CURRENT_PROJECT_VERSION = 155;
 				DEVELOPMENT_TEAM = 79NK8S894T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VoiceFlowKeyboard/Info.plist;
