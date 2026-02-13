@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(ThemeManager.self) private var theme
     @Binding var selectedTab: Int
     @Binding var sharedTextData: SharedDataHandler.SharedTextData?
     @Binding var sharedAudioData: SharedDataHandler.SharedAudioData?
@@ -30,15 +31,15 @@ struct ContentView: View {
                 }
                 .tag(1)
             
-            SummarizeView(sharedText: $sharedTextData, prefilledText: $summarizePrefilledText)
-                .tabItem {
-                    Label("Summarize", systemImage: "doc.text.fill")
-                }
-                .tag(2)
-            
             PromptsView()
                 .tabItem {
                     Label("Prompts", systemImage: "sparkles.rectangle.stack")
+                }
+                .tag(2)
+            
+            SummarizeView(sharedText: $sharedTextData, prefilledText: $summarizePrefilledText)
+                .tabItem {
+                    Label("Summarize", systemImage: "doc.text.fill")
                 }
                 .tag(3)
             
@@ -80,5 +81,6 @@ struct ContentView: View {
         summarizePrefilledText: .constant(""),
         speakPrefilledText: .constant("")
     )
+    .environment(ThemeManager.shared)
     .preferredColorScheme(.dark)
 }

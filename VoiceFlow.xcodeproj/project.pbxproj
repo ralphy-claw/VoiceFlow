@@ -19,6 +19,8 @@
 		A10003 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10003 /* Config.swift */; };
 		A10004 /* OpenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10004 /* OpenAIService.swift */; };
 		A10005 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10005 /* AudioRecorder.swift */; };
+		A30002 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30002 /* ThemeManager.swift */; };
+		A30003 /* GeminiImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30003 /* GeminiImageService.swift */; };
 		A10006 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10006 /* AudioPlayer.swift */; };
 		A10007 /* TranscribeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10007 /* TranscribeView.swift */; };
 		A10008 /* SpeakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10008 /* SpeakView.swift */; };
@@ -117,6 +119,8 @@
 		B10003 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		B10004 /* OpenAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIService.swift; sourceTree = "<group>"; };
 		B10005 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
+		B30002 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		B30003 /* GeminiImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiImageService.swift; sourceTree = "<group>"; };
 		B10006 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		B10007 /* TranscribeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscribeView.swift; sourceTree = "<group>"; };
 		B10008 /* SpeakView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakView.swift; sourceTree = "<group>"; };
@@ -268,6 +272,8 @@
 			children = (
 				B10004 /* OpenAIService.swift */,
 				B10005 /* AudioRecorder.swift */,
+				B30002 /* ThemeManager.swift */,
+				B30003 /* GeminiImageService.swift */,
 				B10006 /* AudioPlayer.swift */,
 				B10014 /* KeychainService.swift */,
 				B10015 /* ServiceProvider.swift */,
@@ -564,6 +570,8 @@
 				A10003 /* Config.swift in Sources */,
 				A10004 /* OpenAIService.swift in Sources */,
 				A10005 /* AudioRecorder.swift in Sources */,
+				A30002 /* ThemeManager.swift in Sources */,
+				A30003 /* GeminiImageService.swift in Sources */,
 				A10006 /* AudioPlayer.swift in Sources */,
 				A10007 /* TranscribeView.swift in Sources */,
 				A10008 /* SpeakView.swift in Sources */,

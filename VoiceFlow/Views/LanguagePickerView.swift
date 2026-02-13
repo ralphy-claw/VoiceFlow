@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LanguagePickerView: View {
+    @Environment(ThemeManager.self) private var theme
     @Binding var selectedLanguage: String
     @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
@@ -107,5 +108,7 @@ struct LanguagePickerView: View {
 
 #Preview {
     LanguagePickerView(selectedLanguage: .constant("auto"))
+        
+        .environment(ThemeManager.shared)
         .preferredColorScheme(.dark)
 }

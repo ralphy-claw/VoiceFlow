@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct SummarizeView: View {
+    @Environment(ThemeManager.self) private var theme
     @Binding var sharedText: SharedDataHandler.SharedTextData?
     @Binding var prefilledText: String
     
@@ -348,5 +349,7 @@ private struct SummaryHistoryRow: View {
 
 #Preview {
     SummarizeView(sharedText: .constant(nil), prefilledText: .constant(""))
+        
+        .environment(ThemeManager.shared)
         .preferredColorScheme(.dark)
 }

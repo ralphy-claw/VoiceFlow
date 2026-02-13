@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct SpeakView: View {
+    @Environment(ThemeManager.self) private var theme
     @Binding var sharedText: SharedDataHandler.SharedTextData?
     @Binding var prefilledText: String
     
@@ -284,9 +285,14 @@ struct SpeakView: View {
     }
     
     private func shareAudio() {
-        guard let data = audioData else { return }
+        guard let data = audioData else {
+            errorMessage = "No audio to share. Generate speech first."
+            showError = true
+            return
+        }
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("voiceflow_tts.mp3")
         do {
+            try? FileManager.default.removeItem(at: tempURL)
             try data.write(to: tempURL)
             shareURL = tempURL
             showShareSheet = true
@@ -317,6 +323,8 @@ private struct TTSHistoryRow: View {
     var onCopy: () -> Void = {}
     @StateObject private var player = AudioPlayer()
     @State private var errorMessage: String?
+    @State private var showShareSheet = false
+    @State private var shareURL: URL?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -351,7 +359,7 @@ private struct TTSHistoryRow: View {
                             .font(.title2)
                             .foregroundStyle(Color.bitcoinOrange)
                     }
-                    .buttonStyle(ScaleButtonStyle())
+                    .buttonStyle(.borderless)
                     
                     Button {
                         onCopy()
@@ -360,7 +368,16 @@ private struct TTSHistoryRow: View {
                             .font(.title3)
                             .foregroundStyle(Color.bitcoinOrange)
                     }
-                    .buttonStyle(ScaleButtonStyle())
+                    .buttonStyle(.borderless)
+                    
+                    Button {
+                        shareRecordAudio()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.title3)
+                            .foregroundStyle(Color.bitcoinOrange)
+                    }
+                    .buttonStyle(.borderless)
                 }
             }
         }
@@ -368,6 +385,14 @@ private struct TTSHistoryRow: View {
         .contextMenu {
             Button { onCopy() } label: {
                 Label("Copy Text", systemImage: "doc.on.doc")
+            }
+            Button { shareRecordAudio() } label: {
+                Label("Share Audio", systemImage: "square.and.arrow.up")
+            }
+        }
+        .sheet(isPresented: $showShareSheet) {
+            if let url = shareURL {
+                ShareSheet(activityItems: [url])
             }
         }
     }
@@ -387,9 +412,23 @@ private struct TTSHistoryRow: View {
             // silently fail
         }
     }
+    
+    private func shareRecordAudio() {
+        guard let filename = record.audioFilePath else { return }
+        let docsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let fileURL = docsURL.appendingPathComponent(filename)
+        guard FileManager.default.fileExists(atPath: fileURL.path) else { return }
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("voiceflow_\(record.id).mp3")
+        try? FileManager.default.removeItem(at: tempURL)
+        try? FileManager.default.copyItem(at: fileURL, to: tempURL)
+        shareURL = tempURL
+        showShareSheet = true
+    }
 }
 
 #Preview {
     SpeakView(sharedText: .constant(nil), prefilledText: .constant(""))
+        
+        .environment(ThemeManager.shared)
         .preferredColorScheme(.dark)
 }

@@ -7,6 +7,8 @@ struct SettingsView: View {
     @State private var sttSettings = STTSettings()
     @State private var summarizeSettings = SummarizeSettings()
     @State private var showKeyboardSetup = false
+    @Environment(ThemeManager.self) private var theme
+    @State private var geminiAPIKey = ""
     
     var body: some View {
         NavigationStack {
@@ -33,6 +35,89 @@ struct SettingsView: View {
                         .foregroundColor(.bitcoinOrange)
                 } footer: {
                     Text("Follow the setup guide to enable the VoiceFlow keyboard for voice typing in any app.")
+                        .foregroundColor(.gray)
+                }
+                
+                // MARK: - Theme
+                Section {
+                    ForEach(ThemePreset.allCases.filter { $0 != .custom }) { preset in
+                        Button {
+                            HapticService.impact(.light)
+                            theme.selectedPreset = preset
+                        } label: {
+                            HStack {
+                                Circle()
+                                    .fill(preset.colors.accent)
+                                    .frame(width: 24, height: 24)
+                                Text(preset.rawValue)
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if theme.selectedPreset == preset {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(Color.bitcoinOrange)
+                                }
+                            }
+                        }
+                        .buttonStyle(.borderless)
+                        .listRowBackground(Color.darkSurface)
+                    }
+                    
+                    Button {
+                        HapticService.impact(.light)
+                        theme.selectedPreset = .custom
+                    } label: {
+                        HStack {
+                            Image(systemName: "paintpalette")
+                                .foregroundStyle(Color.bitcoinOrange)
+                            Text("Custom")
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if theme.selectedPreset == .custom {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(Color.bitcoinOrange)
+                            }
+                        }
+                    }
+                    .buttonStyle(.borderless)
+                    .listRowBackground(Color.darkSurface)
+                    
+                    if theme.selectedPreset == .custom {
+                        ColorPicker("Accent", selection: Bindable(theme).accentColor)
+                            .listRowBackground(Color.darkSurface)
+                            .onChange(of: theme.accentColor) { theme.saveCustomColors() }
+                        ColorPicker("Background", selection: Bindable(theme).backgroundColor)
+                            .listRowBackground(Color.darkSurface)
+                            .onChange(of: theme.backgroundColor) { theme.saveCustomColors() }
+                        ColorPicker("Surface", selection: Bindable(theme).surfaceColor)
+                            .listRowBackground(Color.darkSurface)
+                            .onChange(of: theme.surfaceColor) { theme.saveCustomColors() }
+                        ColorPicker("Text", selection: Bindable(theme).textColor)
+                            .listRowBackground(Color.darkSurface)
+                            .onChange(of: theme.textColor) { theme.saveCustomColors() }
+                    }
+                } header: {
+                    Label("Theme", systemImage: "paintbrush.fill")
+                        .foregroundColor(.bitcoinOrange)
+                }
+                
+                // MARK: - Gemini API
+                Section {
+                    HStack {
+                        SecureField("Enter Gemini API Key", text: $geminiAPIKey)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .font(.system(.body, design: .monospaced))
+                            .onAppear { geminiAPIKey = KeychainService.read(key: "geminiAPIKey") ?? "" }
+                            .onChange(of: geminiAPIKey) { _, newValue in
+                                try? KeychainService.save(key: "geminiAPIKey", value: newValue)
+                            }
+                    }
+                    .listRowBackground(Color.darkSurface)
+                } header: {
+                    Label("Gemini (Image Gen)", systemImage: "photo.badge.plus")
+                        .foregroundColor(.bitcoinOrange)
+                } footer: {
+                    Text("Used for AI image generation in the Prompts tab.")
                         .foregroundColor(.gray)
                 }
                 
@@ -331,5 +416,7 @@ struct APIKeyOnboardingView: View {
 
 #Preview {
     SettingsView()
+        
+        .environment(ThemeManager.shared)
         .preferredColorScheme(.dark)
 }
