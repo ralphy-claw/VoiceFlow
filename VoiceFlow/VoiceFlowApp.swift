@@ -7,6 +7,7 @@ struct VoiceFlowApp: App {
     @State private var sharedTextData: SharedDataHandler.SharedTextData?
     @State private var sharedAudioData: SharedDataHandler.SharedAudioData?
     @State private var summarizePrefilledText = ""
+    @State private var speakPrefilledText = ""
     
     var body: some Scene {
         WindowGroup {
@@ -14,7 +15,8 @@ struct VoiceFlowApp: App {
                 selectedTab: $selectedTab,
                 sharedTextData: $sharedTextData,
                 sharedAudioData: $sharedAudioData,
-                summarizePrefilledText: $summarizePrefilledText
+                summarizePrefilledText: $summarizePrefilledText,
+                speakPrefilledText: $speakPrefilledText
             )
             .preferredColorScheme(.dark)
             .onOpenURL { url in

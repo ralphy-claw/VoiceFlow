@@ -6,11 +6,12 @@ struct TranscribeView: View {
     @Binding var sharedAudioData: SharedDataHandler.SharedAudioData?
     @Binding var selectedTab: Int
     @Binding var summarizePrefilledText: String
+    @Binding var speakPrefilledText: String
     
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TranscriptionRecord.timestamp, order: .reverse) private var history: [TranscriptionRecord]
     @StateObject private var recorder = AudioRecorder()
-    @StateObject private var networkMonitor = NetworkMonitor.shared
+    @State private var networkMonitor = NetworkMonitor.shared
     @State private var transcription = ""
     @State private var isTranscribing = false
     @State private var errorMessage: String?
@@ -47,15 +48,19 @@ struct TranscribeView: View {
         return history.filter { $0.displayText.localizedCaseInsensitiveContains(searchText) }
     }
     
+    private static let dateSectionFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        return f
+    }()
+    
     // #42 — Date-grouped history
     private var groupedHistory: [(String, [TranscriptionRecord])] {
         let calendar = Calendar.current
         let grouped = Dictionary(grouping: filteredHistory) { record -> String in
             if calendar.isDateInToday(record.timestamp) { return "Today" }
             if calendar.isDateInYesterday(record.timestamp) { return "Yesterday" }
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            return formatter.string(from: record.timestamp)
+            return Self.dateSectionFormatter.string(from: record.timestamp)
         }
         // Sort groups by newest first
         return grouped.sorted { lhs, rhs in
@@ -322,8 +327,7 @@ struct TranscribeView: View {
                                     .accessibilityHint("Switches to Summarize tab with this text")
                                     
                                     Button {
-                                        // Navigate to Speak tab with text
-                                        UIPasteboard.general.string = transcription
+                                        speakPrefilledText = transcription
                                         selectedTab = 1
                                     } label: {
                                         Label("Speak This", systemImage: "speaker.wave.2.fill")
@@ -438,7 +442,7 @@ struct TranscribeView: View {
                                                 selectedTab = 2
                                             },
                                             onSpeak: {
-                                                UIPasteboard.general.string = record.displayText
+                                                speakPrefilledText = record.displayText
                                                 selectedTab = 1
                                             }
                                         )
@@ -824,6 +828,6 @@ private struct TranscriptionHistoryRow: View {
 }
 
 #Preview {
-    TranscribeView(sharedAudioData: .constant(nil), selectedTab: .constant(0), summarizePrefilledText: .constant(""))
+    TranscribeView(sharedAudioData: .constant(nil), selectedTab: .constant(0), summarizePrefilledText: .constant(""), speakPrefilledText: .constant(""))
         .preferredColorScheme(.dark)
 }

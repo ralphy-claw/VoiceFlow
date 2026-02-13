@@ -8,10 +8,7 @@ enum KeyboardStatusChecker {
     /// Returns `true` when VoiceFlow keyboard appears in the active keyboards list.
     static var isKeyboardEnabled: Bool {
         guard let keyboards = UserDefaults.standard.object(forKey: "AppleKeyboards") as? [String] else {
-            // Fallback: check via text input mode
-            return UITextInputMode.activeInputModes.contains { mode in
-                mode.value(forKey: "identifier") as? String == keyboardBundleID
-            }
+            return false
         }
         return keyboards.contains(keyboardBundleID)
     }

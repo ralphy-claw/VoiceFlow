@@ -5,6 +5,7 @@ struct ContentView: View {
     @Binding var sharedTextData: SharedDataHandler.SharedTextData?
     @Binding var sharedAudioData: SharedDataHandler.SharedAudioData?
     @Binding var summarizePrefilledText: String
+    @Binding var speakPrefilledText: String
     
     @State private var showOnboarding = false
     @State private var showKeyboardOnboarding = false
@@ -15,14 +16,15 @@ struct ContentView: View {
             TranscribeView(
                 sharedAudioData: $sharedAudioData,
                 selectedTab: $selectedTab,
-                summarizePrefilledText: $summarizePrefilledText
+                summarizePrefilledText: $summarizePrefilledText,
+                speakPrefilledText: $speakPrefilledText
             )
                 .tabItem {
                     Label("Transcribe", systemImage: "mic.fill")
                 }
                 .tag(0)
             
-            SpeakView(sharedText: $sharedTextData)
+            SpeakView(sharedText: $sharedTextData, prefilledText: $speakPrefilledText)
                 .tabItem {
                     Label("Speak", systemImage: "speaker.wave.2.fill")
                 }
@@ -69,7 +71,8 @@ struct ContentView: View {
         selectedTab: .constant(0),
         sharedTextData: .constant(nil),
         sharedAudioData: .constant(nil),
-        summarizePrefilledText: .constant("")
+        summarizePrefilledText: .constant(""),
+        speakPrefilledText: .constant("")
     )
     .preferredColorScheme(.dark)
 }

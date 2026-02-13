@@ -1,13 +1,15 @@
 import Network
 import Foundation
+import Observation
 
 /// Monitors network reachability using NWPathMonitor (#40).
+@Observable
 @MainActor
-class NetworkMonitor: ObservableObject {
+final class NetworkMonitor {
     static let shared = NetworkMonitor()
     
-    @Published var isConnected = true
-    @Published var connectionType: NWInterface.InterfaceType?
+    var isConnected = true
+    var connectionType: NWInterface.InterfaceType?
     
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitor")
@@ -50,8 +52,9 @@ extension URLSession {
                 if let http = response as? HTTPURLResponse {
                     switch http.statusCode {
                     case 429, 503:
-                        // Retry with exponential backoff
-                        let delay = pow(2.0, Double(attempt)) * 0.5
+                        // Respect Retry-After header when available
+                        let retryAfter = http.value(forHTTPHeaderField: "Retry-After").flatMap(Double.init)
+                        let delay = retryAfter ?? pow(2.0, Double(attempt)) * 0.5
                         try await Task.sleep(for: .seconds(delay))
                         lastError = OpenAIError.apiError("Server returned \(http.statusCode)")
                         continue
@@ -62,6 +65,7 @@ extension URLSession {
                 
                 return (data, response)
             } catch {
+                if error is CancellationError { throw error }
                 lastError = error
                 if attempt < maxRetries - 1 {
                     let delay = pow(2.0, Double(attempt)) * 0.5

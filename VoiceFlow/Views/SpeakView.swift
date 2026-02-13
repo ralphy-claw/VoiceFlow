@@ -3,6 +3,7 @@ import SwiftData
 
 struct SpeakView: View {
     @Binding var sharedText: SharedDataHandler.SharedTextData?
+    @Binding var prefilledText: String
     
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TTSRecord.timestamp, order: .reverse) private var history: [TTSRecord]
@@ -186,6 +187,12 @@ struct SpeakView: View {
                     inputText = data.text
                     SharedDataHandler.clearSharedText()
                     sharedText = nil
+                }
+            }
+            .onChange(of: prefilledText) { _, newText in
+                if !newText.isEmpty {
+                    inputText = newText
+                    prefilledText = ""
                 }
             }
             .sheet(isPresented: $showShareSheet) {
@@ -372,6 +379,6 @@ private struct TTSHistoryRow: View {
 }
 
 #Preview {
-    SpeakView(sharedText: .constant(nil))
+    SpeakView(sharedText: .constant(nil), prefilledText: .constant(""))
         .preferredColorScheme(.dark)
 }
