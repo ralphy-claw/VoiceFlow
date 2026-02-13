@@ -18,12 +18,57 @@ struct TranscribeView: View {
     @State private var showCopyToast = false
     @State private var sttSettings = STTSettings()
     
+    // #25 — Continuous mode
+    @State private var continuousMode = false
+    @State private var continuousText = ""
+    
+    // #26 — Language
+    @State private var showLanguagePicker = false
+    
+    // #27 — Editing
+    @State private var isEditingTranscription = false
+    @State private var editingRecordID: UUID?
+    @State private var editText = ""
+    @State private var currentTranscriptionRecord: TranscriptionRecord?
+    @AppStorage("hasSeenEditHint") private var hasSeenEditHint = false
+    
     var body: some View {
         NavigationStack {
             List {
                 // MARK: - Controls Section
                 Section {
                     VStack(spacing: 16) {
+                        // Mode toggle & language button
+                        HStack {
+                            // Continuous mode toggle (#25)
+                            Toggle(isOn: $continuousMode) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: continuousMode ? "waveform" : "mic.fill")
+                                        .font(.caption)
+                                    Text(continuousMode ? "Continuous" : "Single-shot")
+                                        .font(.caption)
+                                }
+                            }
+                            .toggleStyle(.button)
+                            .tint(.bitcoinOrange)
+                            .disabled(recorder.isRecording)
+                            
+                            Spacer()
+                            
+                            // Language quick toggle (#26)
+                            Button {
+                                showLanguagePicker = true
+                            } label: {
+                                Text(sttSettings.languageDisplayCode)
+                                    .font(.caption.bold().monospaced())
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.darkSurfaceLight)
+                                    .clipShape(Capsule())
+                                    .foregroundStyle(Color.bitcoinOrange)
+                            }
+                        }
+                        
                         HStack(spacing: 30) {
                             Button {
                                 handleRecord()
@@ -39,7 +84,7 @@ struct TranscribeView: View {
                                                 .offset(x: 24, y: -24)
                                         }
                                     }
-                                    Text(recorder.isRecording ? "Stop" : "Record")
+                                    Text(recorder.isRecording ? (continuousMode ? "Finish" : "Stop") : "Record")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
@@ -72,10 +117,20 @@ struct TranscribeView: View {
                         .pickerStyle(.segmented)
                         .disabled(isTranscribing || recorder.isRecording)
                         
+                        // Audio level meter (#25)
                         if recorder.isRecording {
+                            AudioLevelMeter(level: recorder.audioLevel)
+                                .padding(.horizontal)
+                            
                             Text(String(format: "%.1fs", recorder.recordingTime))
                                 .font(.title2.monospacedDigit())
                                 .foregroundStyle(Color.bitcoinOrange)
+                            
+                            if continuousMode {
+                                Text("Recording continuously — tap Stop to finish")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                         
                         if isTranscribing {
@@ -83,7 +138,38 @@ struct TranscribeView: View {
                                 .tint(.bitcoinOrange)
                         }
                         
-                        if !transcription.isEmpty {
+                        // Continuous mode accumulated text
+                        if continuousMode && !continuousText.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text("Continuous Transcription")
+                                        .font(.headline)
+                                    Spacer()
+                                    Button {
+                                        UIPasteboard.general.string = continuousText
+                                        HapticService.notification(.success)
+                                        withAnimation { showCopyToast = true }
+                                    } label: {
+                                        Image(systemName: "doc.on.doc.fill")
+                                            .font(.body)
+                                            .foregroundStyle(Color.bitcoinOrange)
+                                            .frame(width: 36, height: 36)
+                                            .background(Color.darkSurfaceLight)
+                                            .clipShape(Circle())
+                                    }
+                                    .buttonStyle(ScaleButtonStyle())
+                                }
+                                Text(continuousText)
+                                    .padding(8)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(Color.darkSurfaceLight)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .textSelection(.enabled)
+                            }
+                        }
+                        
+                        // Single-shot transcription result (#27 — editable)
+                        if !transcription.isEmpty && !continuousMode {
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack {
                                     Text("Transcription")
@@ -107,6 +193,7 @@ struct TranscribeView: View {
                                     
                                     Button {
                                         transcription = ""
+                                        isEditingTranscription = false
                                         HapticService.impact(.light)
                                     } label: {
                                         Image(systemName: "trash.fill")
@@ -119,30 +206,73 @@ struct TranscribeView: View {
                                     .buttonStyle(ScaleButtonStyle())
                                 }
                                 
-                                Text(transcription)
-                                    .padding(8)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(Color.darkSurfaceLight)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .textSelection(.enabled)
-                                    .contextMenu {
-                                        Button {
-                                            UIPasteboard.general.string = transcription
-                                            HapticService.notification(.success)
-                                            withAnimation {
-                                                showCopyToast = true
+                                if isEditingTranscription {
+                                    TextEditor(text: $transcription)
+                                        .scrollContentBackground(.hidden)
+                                        .padding(8)
+                                        .frame(minHeight: 100)
+                                        .background(Color.darkSurfaceLight)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .onChange(of: transcription) { _, newValue in
+                                            // Save edits back to the record
+                                            if let record = currentTranscriptionRecord {
+                                                record.editedText = newValue
+                                                try? modelContext.save()
                                             }
-                                        } label: {
-                                            Label("Copy", systemImage: "doc.on.doc")
                                         }
-                                        
-                                        Button {
-                                            transcription = ""
-                                            HapticService.impact(.light)
-                                        } label: {
-                                            Label("Clear", systemImage: "trash")
-                                        }
+                                    
+                                    Button("Done Editing") {
+                                        isEditingTranscription = false
+                                        HapticService.impact(.light)
                                     }
+                                    .font(.caption)
+                                    .foregroundStyle(Color.bitcoinOrange)
+                                } else {
+                                    Text(transcription)
+                                        .padding(8)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Color.darkSurfaceLight)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .textSelection(.enabled)
+                                        .onTapGesture {
+                                            isEditingTranscription = true
+                                            if !hasSeenEditHint {
+                                                hasSeenEditHint = true
+                                            }
+                                        }
+                                        .contextMenu {
+                                            Button {
+                                                UIPasteboard.general.string = transcription
+                                                HapticService.notification(.success)
+                                                withAnimation {
+                                                    showCopyToast = true
+                                                }
+                                            } label: {
+                                                Label("Copy", systemImage: "doc.on.doc")
+                                            }
+                                            
+                                            Button {
+                                                isEditingTranscription = true
+                                            } label: {
+                                                Label("Edit", systemImage: "pencil")
+                                            }
+                                            
+                                            Button {
+                                                transcription = ""
+                                                HapticService.impact(.light)
+                                            } label: {
+                                                Label("Clear", systemImage: "trash")
+                                            }
+                                        }
+                                    
+                                    // "Tap to edit" hint (#27)
+                                    if !hasSeenEditHint {
+                                        Text("Tap to edit transcription")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                            .italic()
+                                    }
+                                }
                             }
                         }
                     }
@@ -166,15 +296,34 @@ struct TranscribeView: View {
                         .listRowBackground(Color.darkSurface)
                     } else {
                         ForEach(history) { record in
-                            TranscriptionHistoryRow(record: record, isExpanded: expandedRecordID == record.id) {
-                                UIPasteboard.general.string = record.transcribedText
-                                HapticService.notification(.success)
-                                withAnimation { showCopyToast = true }
-                            }
+                            TranscriptionHistoryRow(
+                                record: record,
+                                isExpanded: expandedRecordID == record.id,
+                                isEditing: editingRecordID == record.id,
+                                editText: editingRecordID == record.id ? $editText : .constant(""),
+                                onCopy: {
+                                    UIPasteboard.general.string = record.displayText
+                                    HapticService.notification(.success)
+                                    withAnimation { showCopyToast = true }
+                                },
+                                onEdit: {
+                                    if editingRecordID == record.id {
+                                        // Save and stop editing
+                                        record.editedText = editText
+                                        try? modelContext.save()
+                                        editingRecordID = nil
+                                    } else {
+                                        editText = record.displayText
+                                        editingRecordID = record.id
+                                    }
+                                }
+                            )
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    withAnimation(.easeInOut(duration: 0.25)) {
-                                        expandedRecordID = expandedRecordID == record.id ? nil : record.id
+                                    if editingRecordID != record.id {
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            expandedRecordID = expandedRecordID == record.id ? nil : record.id
+                                        }
                                     }
                                 }
                                 .listRowBackground(Color.darkSurface)
@@ -197,6 +346,9 @@ struct TranscribeView: View {
             .fileImporter(isPresented: $showFilePicker, allowedContentTypes: [.audio, .mpeg4Audio, .mp3, .wav]) { result in
                 handleFileImport(result)
             }
+            .sheet(isPresented: $showLanguagePicker) {
+                LanguagePickerView(selectedLanguage: $sttSettings.language)
+            }
             .onChange(of: sharedAudioData) { _, newData in
                 if let data = newData {
                     handleSharedAudio(data)
@@ -216,16 +368,53 @@ struct TranscribeView: View {
     private func handleRecord() {
         if recorder.isRecording {
             HapticService.impact(.medium)
-            guard let url = recorder.stopRecording() else { return }
-            lastSourceType = "recording"
-            transcribeFile(at: url, sourceType: "recording", duration: recorder.recordingTime)
+            if continuousMode {
+                let _ = recorder.stopContinuousRecording()
+                // Don't transcribe the final segment separately — it would
+                // duplicate the per-segment records already created via
+                // transcribeSegment. Just keep the accumulated continuousText.
+            } else {
+                guard let url = recorder.stopRecording() else { return }
+                lastSourceType = "recording"
+                transcribeFile(at: url, sourceType: "recording", duration: recorder.recordingTime)
+            }
         } else {
             do {
                 HapticService.impact(.heavy)
-                try recorder.startRecording()
+                if continuousMode {
+                    continuousText = ""
+                    try recorder.startContinuousRecording { segmentURL in
+                        transcribeSegment(at: segmentURL)
+                    }
+                } else {
+                    try recorder.startRecording()
+                }
             } catch {
                 errorMessage = error.localizedDescription
                 showError = true
+            }
+        }
+    }
+    
+    private func transcribeSegment(at url: URL) {
+        Task {
+            do {
+                let data = try Data(contentsOf: url)
+                let lang = sttSettings.language
+                let text = try await OpenAIService.shared.transcribe(
+                    audioData: data,
+                    filename: url.lastPathComponent,
+                    language: lang == "auto" ? nil : lang
+                )
+                if !text.isEmpty {
+                    if continuousText.isEmpty {
+                        continuousText = text
+                    } else {
+                        continuousText += "\n" + text
+                    }
+                }
+            } catch {
+                // Silently continue in continuous mode
             }
         }
     }
@@ -252,20 +441,35 @@ struct TranscribeView: View {
         Task {
             do {
                 let text: String
+                let lang = sttSettings.language
                 
                 switch sttSettings.provider {
                 case .cloud:
                     let data = try Data(contentsOf: url)
-                    text = try await OpenAIService.shared.transcribe(audioData: data, filename: url.lastPathComponent)
+                    text = try await OpenAIService.shared.transcribe(
+                        audioData: data,
+                        filename: url.lastPathComponent,
+                        language: lang == "auto" ? nil : lang
+                    )
                     
                 case .local:
-                    text = try await WhisperKitService.shared.transcribe(audioURL: url)
+                    text = try await WhisperKitService.shared.transcribe(
+                        audioURL: url,
+                        language: lang == "auto" ? nil : lang
+                    )
                 }
                 
                 transcription = text
-                let record = TranscriptionRecord(sourceType: sourceType, transcribedText: text, duration: duration)
+                isEditingTranscription = false
+                let record = TranscriptionRecord(
+                    sourceType: sourceType,
+                    transcribedText: text,
+                    duration: duration,
+                    language: lang
+                )
                 modelContext.insert(record)
                 try? modelContext.save()
+                currentTranscriptionRecord = record
             } catch {
                 errorMessage = error.localizedDescription
                 showError = true
@@ -285,17 +489,25 @@ struct TranscribeView: View {
 private struct TranscriptionHistoryRow: View {
     let record: TranscriptionRecord
     let isExpanded: Bool
+    var isEditing: Bool = false
+    @Binding var editText: String
     var onCopy: () -> Void = {}
+    var onEdit: () -> Void = {}
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Image(systemName: record.sourceType == "recording" ? "mic.fill" : "doc.fill")
+                Image(systemName: iconName)
                     .foregroundStyle(Color.bitcoinOrange)
                     .font(.caption)
-                Text(record.transcribedText)
+                Text(record.displayText)
                     .lineLimit(isExpanded ? nil : 2)
                 Spacer()
+                if let lang = record.language, lang != "auto" {
+                    Text(lang.uppercased())
+                        .font(.caption2.monospaced())
+                        .foregroundStyle(.secondary)
+                }
                 Image(systemName: "chevron.right")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
@@ -308,18 +520,42 @@ private struct TranscriptionHistoryRow: View {
             
             if isExpanded {
                 Divider()
-                Text(record.transcribedText)
-                    .font(.body)
-                    .textSelection(.enabled)
                 
-                Button {
-                    onCopy()
-                } label: {
-                    Image(systemName: "doc.on.doc.fill")
-                        .font(.title3)
-                        .foregroundStyle(Color.bitcoinOrange)
+                if isEditing {
+                    TextEditor(text: $editText)
+                        .scrollContentBackground(.hidden)
+                        .padding(8)
+                        .frame(minHeight: 80)
+                        .background(Color.darkSurfaceLight)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                } else {
+                    Text(record.displayText)
+                        .font(.body)
+                        .textSelection(.enabled)
+                    
+                    if record.editedText != nil {
+                        Text("Edited")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .italic()
+                    }
                 }
-                .buttonStyle(ScaleButtonStyle())
+                
+                HStack(spacing: 16) {
+                    Button { onCopy() } label: {
+                        Image(systemName: "doc.on.doc.fill")
+                            .font(.title3)
+                            .foregroundStyle(Color.bitcoinOrange)
+                    }
+                    .buttonStyle(ScaleButtonStyle())
+                    
+                    Button { onEdit() } label: {
+                        Image(systemName: isEditing ? "checkmark.circle.fill" : "pencil.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(isEditing ? .green : Color.bitcoinOrange)
+                    }
+                    .buttonStyle(ScaleButtonStyle())
+                }
             }
         }
         .padding(.vertical, 4)
@@ -327,6 +563,17 @@ private struct TranscriptionHistoryRow: View {
             Button { onCopy() } label: {
                 Label("Copy", systemImage: "doc.on.doc")
             }
+            Button { onEdit() } label: {
+                Label("Edit", systemImage: "pencil")
+            }
+        }
+    }
+    
+    private var iconName: String {
+        switch record.sourceType {
+        case "continuous": return "waveform"
+        case "recording": return "mic.fill"
+        default: return "doc.fill"
         }
     }
 }
