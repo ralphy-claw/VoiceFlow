@@ -313,13 +313,37 @@ class KeyboardViewController: UIInputViewController {
             return
         }
         
-        // 2. Check API key
+        // 2. Check microphone permission
+        let micPermission = AVAudioSession.sharedInstance().recordPermission
+        switch micPermission {
+        case .undetermined:
+            // Request permission — will prompt user
+            AVAudioSession.sharedInstance().requestRecordPermission { [weak self] granted in
+                DispatchQueue.main.async {
+                    if granted {
+                        self?.startRecording() // Retry now that we have permission
+                    } else {
+                        self?.state = .error("🎤 Microphone access denied. Allow in Settings → Privacy → Microphone.")
+                    }
+                }
+            }
+            return
+        case .denied:
+            state = .error("🎤 Microphone access denied. Allow in Settings → Privacy → Microphone.")
+            return
+        case .granted:
+            break // Continue
+        @unknown default:
+            break
+        }
+        
+        // 3. Check API key
         guard let apiKey = readAPIKey(), !apiKey.isEmpty else {
             state = .error("No API key. Set it in the VoiceFlow app.")
             return
         }
 
-        // 3. Configure audio session
+        // 4. Configure audio session
         let session = AVAudioSession.sharedInstance()
         do {
             try session.setCategory(.record, mode: .default)
@@ -334,11 +358,11 @@ class KeyboardViewController: UIInputViewController {
             return
         }
 
-        // 4. Clean up any previous recording
+        // 5. Clean up any previous recording
         let fileURL = audioFileURL
         try? FileManager.default.removeItem(at: fileURL)
 
-        // 5. Initialize recorder
+        // 6. Initialize recorder
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
             AVSampleRateKey: 16000,
@@ -355,7 +379,7 @@ class KeyboardViewController: UIInputViewController {
             return
         }
         
-        // 6. Start recording and verify
+        // 7. Start recording and verify
         let started = audioRecorder?.record() ?? false
         if !started || audioRecorder?.isRecording != true {
             NSLog("[VoiceFlowKB] Recorder failed to start. isRecording=\(audioRecorder?.isRecording ?? false)")
@@ -364,7 +388,7 @@ class KeyboardViewController: UIInputViewController {
             return
         }
         
-        // 7. Success — update state
+        // 8. Success — update state
         recordingStartTime = Date()
         state = .recording
         
