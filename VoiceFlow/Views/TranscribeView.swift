@@ -321,9 +321,7 @@ struct TranscribeView: View {
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     if editingRecordID != record.id {
-                                        withAnimation(.easeInOut(duration: 0.25)) {
-                                            expandedRecordID = expandedRecordID == record.id ? nil : record.id
-                                        }
+                                        expandedRecordID = expandedRecordID == record.id ? nil : record.id
                                     }
                                 }
                                 .listRowBackground(Color.darkSurface)
@@ -335,6 +333,7 @@ struct TranscribeView: View {
                 }
             }
             .scrollContentBackground(.hidden)
+            .scrollDismissesKeyboard(.interactively)
             .background(Color.darkBackground.ignoresSafeArea())
             .navigationTitle("Transcribe")
             .toast(isShowing: $showCopyToast, message: "Copied to clipboard")

@@ -186,9 +186,7 @@ struct SummarizeView: View {
                             }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    withAnimation(.easeInOut(duration: 0.25)) {
-                                        expandedRecordID = expandedRecordID == record.id ? nil : record.id
-                                    }
+                                    expandedRecordID = expandedRecordID == record.id ? nil : record.id
                                 }
                                 .listRowBackground(Color.darkSurface)
                         }
@@ -199,6 +197,7 @@ struct SummarizeView: View {
                 }
             }
             .scrollContentBackground(.hidden)
+            .scrollDismissesKeyboard(.interactively)
             .background(Color.darkBackground.ignoresSafeArea())
             .navigationTitle("Summarize")
             .toast(isShowing: $showCopyToast, message: "Copied to clipboard")
