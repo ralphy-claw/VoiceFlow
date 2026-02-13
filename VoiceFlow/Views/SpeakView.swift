@@ -195,6 +195,12 @@ struct SpeakView: View {
                     prefilledText = ""
                 }
             }
+            .onAppear {
+                if !prefilledText.isEmpty {
+                    inputText = prefilledText
+                    prefilledText = ""
+                }
+            }
             .sheet(isPresented: $showShareSheet) {
                 if let url = shareURL {
                     ShareSheet(activityItems: [url])

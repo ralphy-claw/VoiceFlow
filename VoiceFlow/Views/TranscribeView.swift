@@ -315,7 +315,9 @@ struct TranscribeView: View {
                                 HStack(spacing: 12) {
                                     Button {
                                         summarizePrefilledText = transcription
-                                        selectedTab = 2
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            selectedTab = 2
+                                        }
                                     } label: {
                                         Label("Summarize This", systemImage: "sparkles")
                                             .font(.caption.weight(.medium))
@@ -331,7 +333,9 @@ struct TranscribeView: View {
                                     
                                     Button {
                                         speakPrefilledText = transcription
-                                        selectedTab = 1
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            selectedTab = 1
+                                        }
                                     } label: {
                                         Label("Speak This", systemImage: "speaker.wave.2.fill")
                                             .font(.caption.weight(.medium))
@@ -457,11 +461,15 @@ struct TranscribeView: View {
                                             // #43 — Actions
                                             onSummarize: {
                                                 summarizePrefilledText = record.displayText
-                                                selectedTab = 2
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                    selectedTab = 2
+                                                }
                                             },
                                             onSpeak: {
                                                 speakPrefilledText = record.displayText
-                                                selectedTab = 1
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                    selectedTab = 1
+                                                }
                                             }
                                         )
                                     }

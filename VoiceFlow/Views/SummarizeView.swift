@@ -224,6 +224,12 @@ struct SummarizeView: View {
                     prefilledText = ""
                 }
             }
+            .onAppear {
+                if !prefilledText.isEmpty {
+                    inputText = prefilledText
+                    prefilledText = ""
+                }
+            }
         }
     }
     
