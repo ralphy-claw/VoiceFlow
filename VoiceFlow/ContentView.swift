@@ -47,6 +47,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(selectedTab: .constant(0), sharedTextData: .constant(nil), sharedAudioData: .constant(nil))
         .preferredColorScheme(.dark)
 }

@@ -299,6 +299,6 @@ private struct SummaryHistoryRow: View {
 }
 
 #Preview {
-    SummarizeView()
+    SummarizeView(sharedText: .constant(nil))
         .preferredColorScheme(.dark)
 }

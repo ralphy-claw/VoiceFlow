@@ -296,6 +296,6 @@ private struct TranscriptionHistoryRow: View {
 }
 
 #Preview {
-    TranscribeView()
+    TranscribeView(sharedAudioData: .constant(nil))
         .preferredColorScheme(.dark)
 }
