@@ -44,6 +44,7 @@
 		C90823A1D8C895FF8139FA99 /* ProviderSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4301895128CD195835C4DA23 /* ProviderSelectionTests.swift */; };
 		CDEAA6816C6EF65667D25B42 /* SharedDataHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEC83E9D6C19F9CF4790A2A /* SharedDataHandlerTests.swift */; };
 		D7A2E3AADC50C896F1997695 /* STTSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4A9E3B5A72CBC4BB12EC6B /* STTSettingsTests.swift */; };
+		UI0001 /* VoiceFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = UI0002 /* VoiceFlowUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = T20001;
 			remoteInfo = VoiceFlowKeyboard;
+		};
+		CIPUI01 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = PR1001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = T10001;
+			remoteInfo = VoiceFlow;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -118,6 +126,8 @@
 		B20ENT /* VoiceFlowKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VoiceFlowKeyboard.entitlements; sourceTree = "<group>"; };
 		B30001 /* AudioPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerTests.swift; sourceTree = "<group>"; };
 		DF4A9E3B5A72CBC4BB12EC6B /* STTSettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = STTSettingsTests.swift; sourceTree = "<group>"; };
+		UI0002 /* VoiceFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceFlowUITests.swift; sourceTree = "<group>"; };
+		PUIREF /* VoiceFlowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceFlowUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		P10001 /* VoiceFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoiceFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		P20001 /* VoiceFlowKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VoiceFlowKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		XCC001 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
@@ -141,6 +151,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F20001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FUI001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -192,6 +209,7 @@
 				G10005 /* Products */,
 				D58501F492767B557B97A45B /* Frameworks */,
 				5BCB1239D247448A9C0D5B29 /* VoiceFlowTests */,
+				GUIGRP /* VoiceFlowUITests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -247,6 +265,7 @@
 				P10001 /* VoiceFlow.app */,
 				P20001 /* VoiceFlowKeyboard.appex */,
 				665F6E1DAEAE1E1E675953AB /* VoiceFlowTests.xctest */,
+				PUIREF /* VoiceFlowUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -288,6 +307,14 @@
 				B10017 /* BrandConfiguration.swift */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		GUIGRP /* VoiceFlowUITests */ = {
+			isa = PBXGroup;
+			children = (
+				UI0002 /* VoiceFlowUITests.swift */,
+			);
+			path = VoiceFlowUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -348,6 +375,24 @@
 			productReference = P20001 /* VoiceFlowKeyboard.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		TUI001 /* VoiceFlowUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CUICFG /* Build configuration list for PBXNativeTarget "VoiceFlowUITests" */;
+			buildPhases = (
+				SUI001 /* Sources */,
+				FUI001 /* Frameworks */,
+				RUI001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DEPUI01 /* PBXTargetDependency */,
+			);
+			name = VoiceFlowUITests;
+			productName = VoiceFlowUITests;
+			productReference = PUIREF /* VoiceFlowUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -382,6 +427,7 @@
 				T10001 /* VoiceFlow */,
 				T20001 /* VoiceFlowKeyboard */,
 				9215CC5051E8B00408ECB108 /* VoiceFlowTests */,
+				TUI001 /* VoiceFlowUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -403,6 +449,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		R20001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		RUI001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -488,6 +541,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		SUI001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				UI0001 /* VoiceFlowUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -501,6 +562,11 @@
 			isa = PBXTargetDependency;
 			target = T20001 /* VoiceFlowKeyboard */;
 			targetProxy = CIP2001 /* PBXContainerItemProxy */;
+		};
+		DEPUI01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = T10001 /* VoiceFlow */;
+			targetProxy = CIPUI01 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -599,7 +665,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = VoiceFlowKeyboard/VoiceFlowKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 126;
 				DEVELOPMENT_TEAM = 79NK8S894T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VoiceFlowKeyboard/Info.plist;
@@ -625,7 +691,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = VoiceFlowKeyboard/VoiceFlowKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 126;
 				DEVELOPMENT_TEAM = 79NK8S894T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = VoiceFlowKeyboard/Info.plist;
@@ -664,6 +730,37 @@
 			};
 			name = Debug;
 		};
+		BCUI01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lubodev.voiceflow.uitests;
+				PRODUCT_MODULE_NAME = VoiceFlowUITests;
+				PRODUCT_NAME = VoiceFlowUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = VoiceFlow;
+			};
+			name = Debug;
+		};
+		BCUI02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lubodev.voiceflow.uitests;
+				PRODUCT_MODULE_NAME = VoiceFlowUITests;
+				PRODUCT_NAME = VoiceFlowUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = VoiceFlow;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -699,6 +796,15 @@
 			buildConfigurations = (
 				BC2003 /* Debug */,
 				BC2004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CUICFG /* Build configuration list for PBXNativeTarget "VoiceFlowUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BCUI01 /* Debug */,
+				BCUI02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

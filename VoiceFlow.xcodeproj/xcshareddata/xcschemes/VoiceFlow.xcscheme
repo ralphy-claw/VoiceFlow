@@ -34,6 +34,20 @@
                ReferencedContainer = "container:VoiceFlow.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TUI001"
+               BuildableName = "VoiceFlowUITests.xctest"
+               BlueprintName = "VoiceFlowUITests"
+               ReferencedContainer = "container:VoiceFlow.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -49,6 +63,16 @@
                BlueprintIdentifier = "9215CC5051E8B00408ECB108"
                BuildableName = "VoiceFlowTests.xctest"
                BlueprintName = "VoiceFlowTests"
+               ReferencedContainer = "container:VoiceFlow.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TUI001"
+               BuildableName = "VoiceFlowUITests.xctest"
+               BlueprintName = "VoiceFlowUITests"
                ReferencedContainer = "container:VoiceFlow.xcodeproj">
             </BuildableReference>
          </TestableReference>
