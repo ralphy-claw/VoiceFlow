@@ -29,6 +29,13 @@
 		A20003 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10003; };
 		A20010 /* VoiceFlowKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = P20001; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A10017 /* BrandConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10017; };
+		A10018 /* SharedDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10018; };
+		A10019 /* HapticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10019; };
+		A10020 /* ElevenLabsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10020; };
+		A10021 /* WhisperKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10021; };
+		A10022 /* SummarizeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10022; };
+		A10023 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10023; };
+		A10024 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B10024; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +89,13 @@
 		B10017 /* BrandConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandConfiguration.swift; sourceTree = "<group>"; };
 		XCC001 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		XCC002 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		B10018 /* SharedDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDataHandler.swift; sourceTree = "<group>"; };
+		B10019 /* HapticService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticService.swift; sourceTree = "<group>"; };
+		B10020 /* ElevenLabsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsService.swift; sourceTree = "<group>"; };
+		B10021 /* WhisperKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitService.swift; sourceTree = "<group>"; };
+		B10022 /* SummarizeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummarizeSettings.swift; sourceTree = "<group>"; };
+		B10023 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
+		B10024 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +133,7 @@
 				B10002 /* ContentView.swift */,
 				B10003 /* Config.swift */,
 				B10ENT /* VoiceFlow.entitlements */,
+				B10024 /* Info.plist */,
 				GCORE1 /* Core */,
 				G10006 /* Models */,
 				G10003 /* Services */,
@@ -155,6 +170,10 @@
 				B10006 /* AudioPlayer.swift */,
 				B10014 /* KeychainService.swift */,
 				B10015 /* ServiceProvider.swift */,
+				B10018 /* SharedDataHandler.swift */,
+				B10019 /* HapticService.swift */,
+				B10020 /* ElevenLabsService.swift */,
+				B10021 /* WhisperKitService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -165,6 +184,7 @@
 				B10011 /* TranscriptionRecord.swift */,
 				B10012 /* TTSRecord.swift */,
 				B10013 /* SummaryRecord.swift */,
+				B10022 /* SummarizeSettings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -176,6 +196,7 @@
 				B10008 /* SpeakView.swift */,
 				B10009 /* SummarizeView.swift */,
 				B10016 /* SettingsView.swift */,
+				B10023 /* ToastView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -334,6 +355,12 @@
 				A10015 /* ServiceProvider.swift in Sources */,
 				A10016 /* SettingsView.swift in Sources */,
 				A10017 /* BrandConfiguration.swift in Sources */,
+				A10018 /* SharedDataHandler.swift in Sources */,
+				A10019 /* HapticService.swift in Sources */,
+				A10020 /* ElevenLabsService.swift in Sources */,
+				A10021 /* WhisperKitService.swift in Sources */,
+				A10022 /* SummarizeSettings.swift in Sources */,
+				A10023 /* ToastView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
