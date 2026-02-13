@@ -101,8 +101,23 @@ class KeyboardViewController: UIInputViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Prevent UI jumping when switching to this keyboard
+        // Set self-sizing and fixed height before the view appears
+        inputView?.allowsSelfSizing = true
+        
         setupUI()
         checkFullAccess()
+        
+        // Start invisible, fade in during viewDidAppear to avoid layout flash
+        containerView.alpha = 0
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        UIView.animate(withDuration: 0.15) {
+            self.containerView.alpha = 1
+        }
     }
     
     private func checkFullAccess() {
@@ -393,16 +408,17 @@ class KeyboardViewController: UIInputViewController {
             return
         }
         
-        let micPermission = AVAudioApplication.shared.recordPermission
+        // AVAudioApplication doesn't work in keyboard extensions — must use AVAudioSession
+        // nonisolated(unsafe) suppression: AVAudioSession is the only working API in extensions
+        let micPermission = AVAudioSession.sharedInstance().recordPermission // Deprecated in iOS 17, but AVAudioApplication reports .denied in extension sandbox
         switch micPermission {
         case .undetermined:
-            Task {
-                let granted = await AVAudioApplication.requestRecordPermission()
-                await MainActor.run {
+            AVAudioSession.sharedInstance().requestRecordPermission { [weak self] granted in
+                DispatchQueue.main.async {
                     if granted {
-                        self.startRecording()
+                        self?.startRecording()
                     } else {
-                        self.state = .error("🎤 Microphone access denied. Allow in Settings → Privacy → Microphone.")
+                        self?.state = .error("🎤 Microphone access denied. Allow in Settings → Privacy → Microphone.")
                     }
                 }
             }
