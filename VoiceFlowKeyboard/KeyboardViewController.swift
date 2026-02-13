@@ -6,10 +6,19 @@ class KeyboardViewController: UIInputViewController {
     // MARK: - State
     private var isRecording = false
     private var audioRecorder: AVAudioRecorder?
+    private var recordingStartTime: Date?
+    
+    /// Known Whisper hallucination outputs on silence/noise
+    private let whisperHallucinations: Set<String> = [
+        "you", "thank you", "thank you.", "thanks for watching!",
+        "thanks for watching.", "the end.", "the end",
+        "thanks for listening.", "thanks for listening!",
+        "subscribe", "bye.", "bye", "so",
+        "thank you for watching!", "thank you for watching.",
+    ]
 
     // MARK: - UI Elements
     private let micButton = UIButton(type: .system)
-    private let nextKeyboardButton = UIButton(type: .system)
     private let containerView = UIView()
     private let recordingIndicator = UIView()
     private let statusLabel = UILabel()
@@ -61,10 +70,10 @@ class KeyboardViewController: UIInputViewController {
     // MARK: - Setup
 
     private func setupUI() {
-        view.backgroundColor = darkBackground
+        view.backgroundColor = UIColor.clear
 
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = darkBackground
+        containerView.backgroundColor = UIColor.clear
         view.addSubview(containerView)
         
         // Full access banner
@@ -103,16 +112,6 @@ class KeyboardViewController: UIInputViewController {
         micButton.addTarget(self, action: #selector(micTapped), for: .touchUpInside)
         containerView.addSubview(micButton)
 
-        // Next keyboard button
-        nextKeyboardButton.translatesAutoresizingMaskIntoConstraints = false
-        let globeImage = UIImage(systemName: "globe")?.withConfiguration(
-            UIImage.SymbolConfiguration(pointSize: 18, weight: .regular)
-        )
-        nextKeyboardButton.setImage(globeImage, for: .normal)
-        nextKeyboardButton.tintColor = .lightGray
-        nextKeyboardButton.addTarget(self, action: #selector(handleInputModeList(from:with:)), for: .allTouchEvents)
-        containerView.addSubview(nextKeyboardButton)
-
         NSLayoutConstraint.activate([
             containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -138,11 +137,6 @@ class KeyboardViewController: UIInputViewController {
             statusLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             statusLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
             statusLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
-
-            nextKeyboardButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
-            nextKeyboardButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -8),
-            nextKeyboardButton.widthAnchor.constraint(equalToConstant: 36),
-            nextKeyboardButton.heightAnchor.constraint(equalToConstant: 36),
         ])
     }
 
@@ -191,7 +185,9 @@ class KeyboardViewController: UIInputViewController {
 
         do {
             audioRecorder = try AVAudioRecorder(url: audioFileURL, settings: settings)
+            audioRecorder?.isMeteringEnabled = true
             audioRecorder?.record()
+            recordingStartTime = Date()
             isRecording = true
             updateMicButtonAppearance()
             recordingIndicator.isHidden = false
@@ -204,15 +200,22 @@ class KeyboardViewController: UIInputViewController {
     }
 
     private func stopRecording() {
+        let duration = -(recordingStartTime ?? Date()).timeIntervalSinceNow
         audioRecorder?.stop()
         audioRecorder = nil
         isRecording = false
         updateMicButtonAppearance()
         recordingIndicator.isHidden = true
         stopRecordingAnimation()
+
+        // Require at least 0.5s of audio to avoid hallucinations
+        guard duration >= 0.5 else {
+            showStatus("Recording too short", isError: true)
+            return
+        }
+
         statusLabel.text = "Transcribing…"
         statusLabel.textColor = bitcoinOrange
-
         transcribeAudio()
     }
 
@@ -256,6 +259,10 @@ class KeyboardViewController: UIInputViewController {
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"model\"\r\n\r\n".data(using: .utf8)!)
         body.append("\(Config.whisperModel)\r\n".data(using: .utf8)!)
+        // Add response_format for explicit JSON
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"response_format\"\r\n\r\n".data(using: .utf8)!)
+        body.append("verbose_json\r\n".data(using: .utf8)!)
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"file\"; filename=\"audio.m4a\"\r\n".data(using: .utf8)!)
         body.append("Content-Type: audio/m4a\r\n\r\n".data(using: .utf8)!)
@@ -285,14 +292,22 @@ class KeyboardViewController: UIInputViewController {
 
                 do {
                     let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-                    let text = json?["text"] as? String ?? ""
-                    if text.isEmpty {
+                    let text = (json?["text"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                    
+                    // Check for high no_speech probability (verbose_json provides segments)
+                    var isLikelyNoise = false
+                    if let segments = json?["segments"] as? [[String: Any]], let first = segments.first {
+                        let noSpeechProb = first["no_speech_prob"] as? Double ?? 0
+                        if noSpeechProb > 0.5 {
+                            isLikelyNoise = true
+                        }
+                    }
+                    
+                    if text.isEmpty || isLikelyNoise || self?.whisperHallucinations.contains(text.lowercased()) == true {
                         self?.showStatus("No speech detected", isError: true)
                     } else {
-                        // Insert directly into the host app's text field
                         self?.textDocumentProxy.insertText(text)
                         self?.showStatus("✓ Inserted", isError: false)
-                        // Clear status after a moment
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             self?.statusLabel.text = ""
                         }
