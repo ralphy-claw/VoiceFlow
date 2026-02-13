@@ -68,7 +68,7 @@ class WhisperKitService: ObservableObject {
         throw WhisperKitError.notAvailable
     }
     
-    func transcribe(audioURL: URL) async throws -> String {
+    func transcribe(audioURL: URL, language: String? = nil) async throws -> String {
         guard isModelDownloaded else {
             throw WhisperKitError.modelNotDownloaded
         }
@@ -80,7 +80,11 @@ class WhisperKitService: ObservableObject {
         }
         
         do {
-            let result = try await whisperKit.transcribe(audioPath: audioURL.path)
+            var options = DecodingOptions()
+            if let language = language {
+                options.language = language
+            }
+            let result = try await whisperKit.transcribe(audioPath: audioURL.path, decodeOptions: options)
             return result.text
         } catch {
             throw WhisperKitError.transcriptionFailed(error.localizedDescription)

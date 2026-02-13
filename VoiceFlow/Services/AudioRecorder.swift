@@ -1,6 +1,5 @@
 import AVFoundation
 import Foundation
-import Accelerate
 
 @MainActor
 class AudioRecorder: ObservableObject {
@@ -16,7 +15,7 @@ class AudioRecorder: ObservableObject {
     // Continuous mode
     private var audioEngine: AVAudioEngine?
     private var silenceStart: Date?
-    private let silenceThreshold: Float = 0.01
+    private let silenceThreshold: Float = 0.05
     private let silenceDuration: TimeInterval = 1.5
     private var continuousSegments: [URL] = []
     private var currentSegmentURL: URL?
@@ -93,7 +92,7 @@ class AudioRecorder: ObservableObject {
                 self.audioLevel = normalised
                 
                 // Silence detection
-                if normalised < 0.05 {
+                if normalised < self.silenceThreshold {
                     if self.silenceStart == nil {
                         self.silenceStart = Date()
                     } else if let start = self.silenceStart,
@@ -137,10 +136,15 @@ class AudioRecorder: ObservableObject {
         ]
         
         recorder?.stop()
-        recorder = try? AVAudioRecorder(url: url, settings: settings)
-        recorder?.isMeteringEnabled = true
-        recorder?.record()
-        currentSegmentURL = url
+        do {
+            recorder = try AVAudioRecorder(url: url, settings: settings)
+            recorder?.isMeteringEnabled = true
+            recorder?.record()
+            currentSegmentURL = url
+        } catch {
+            print("[AudioRecorder] Failed to start new segment: \(error.localizedDescription)")
+            currentSegmentURL = nil
+        }
     }
     
     private func finalizeSegment() {

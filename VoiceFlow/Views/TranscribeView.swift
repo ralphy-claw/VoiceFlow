@@ -84,7 +84,7 @@ struct TranscribeView: View {
                                                 .offset(x: 24, y: -24)
                                         }
                                     }
-                                    Text(recorder.isRecording ? (continuousMode ? "Stop" : "Stop") : "Record")
+                                    Text(recorder.isRecording ? (continuousMode ? "Finish" : "Stop") : "Record")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
@@ -369,22 +369,10 @@ struct TranscribeView: View {
         if recorder.isRecording {
             HapticService.impact(.medium)
             if continuousMode {
-                let segments = recorder.stopContinuousRecording()
-                // Transcribe any remaining segments
-                if let last = segments.last {
-                    transcribeFile(at: last, sourceType: "recording", duration: recorder.recordingTime)
-                }
-                // Save continuous text as a single record
-                if !continuousText.isEmpty {
-                    let record = TranscriptionRecord(
-                        sourceType: "continuous",
-                        transcribedText: continuousText,
-                        duration: recorder.recordingTime,
-                        language: sttSettings.language
-                    )
-                    modelContext.insert(record)
-                    try? modelContext.save()
-                }
+                let _ = recorder.stopContinuousRecording()
+                // Don't transcribe the final segment separately — it would
+                // duplicate the per-segment records already created via
+                // transcribeSegment. Just keep the accumulated continuousText.
             } else {
                 guard let url = recorder.stopRecording() else { return }
                 lastSourceType = "recording"
@@ -465,7 +453,10 @@ struct TranscribeView: View {
                     )
                     
                 case .local:
-                    text = try await WhisperKitService.shared.transcribe(audioURL: url)
+                    text = try await WhisperKitService.shared.transcribe(
+                        audioURL: url,
+                        language: lang == "auto" ? nil : lang
+                    )
                 }
                 
                 transcription = text
