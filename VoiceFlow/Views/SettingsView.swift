@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var showKeyboardSetup = false
     @Environment(ThemeManager.self) private var theme
     @State private var geminiAPIKey = ""
+    @State private var falAPIKey = ""
     
     var body: some View {
         NavigationStack {
@@ -117,10 +118,31 @@ struct SettingsView: View {
                     Label("Gemini (Image Gen)", systemImage: "photo.badge.plus")
                         .foregroundColor(.bitcoinOrange)
                 } footer: {
-                    Text("Used for AI image generation in the Prompts tab.")
+                    Text("Used for Gemini & Imagen 4 image generation in the Prompts tab.")
                         .foregroundColor(.gray)
                 }
-                
+
+                // MARK: - fal.ai API
+                Section {
+                    HStack {
+                        SecureField("Enter fal.ai API Key", text: $falAPIKey)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .font(.system(.body, design: .monospaced))
+                            .onAppear { falAPIKey = KeychainService.read(key: "falAPIKey") ?? "" }
+                            .onChange(of: falAPIKey) { _, newValue in
+                                try? KeychainService.save(key: "falAPIKey", value: newValue)
+                            }
+                    }
+                    .listRowBackground(Color.darkSurface)
+                } header: {
+                    Label("fal.ai (Flux)", systemImage: "bolt.fill")
+                        .foregroundColor(.bitcoinOrange)
+                } footer: {
+                    Text("Used for Flux image generation in the Prompts tab. Get a key at fal.ai")
+                        .foregroundColor(.gray)
+                }
+
                 // MARK: - Provider Preferences
                 Section {
                     Picker("Speech-to-Text", selection: $sttSettings.provider) {
