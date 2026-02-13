@@ -316,7 +316,7 @@ struct TranscribeView: View {
                                     Button {
                                         summarizePrefilledText = transcription
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                            selectedTab = 2
+                                            selectedTab = 3
                                         }
                                     } label: {
                                         Label("Summarize This", systemImage: "sparkles")
@@ -462,7 +462,7 @@ struct TranscribeView: View {
                                             onSummarize: {
                                                 summarizePrefilledText = record.displayText
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                    selectedTab = 2
+                                                    selectedTab = 3
                                                 }
                                             },
                                             onSpeak: {

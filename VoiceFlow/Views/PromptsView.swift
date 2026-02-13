@@ -17,6 +17,10 @@ struct PromptsView: View {
     @State private var showError = false
     @State private var showCopyToast = false
 
+    // Image generation
+    @State private var isGeneratingImage = false
+    @State private var generatedImage: UIImage?
+
     // Creation flow
     @State private var showCreator = false
 
@@ -175,12 +179,8 @@ struct PromptsView: View {
                 // Preset picker
                 presetPicker
 
-                // Record / transcription
-                if rawTranscription.isEmpty {
-                    recordingArea
-                } else {
-                    transcriptionArea
-                }
+                // Record / type area
+                inputArea
 
                 // Enhanced result
                 if !enhancedPrompt.isEmpty {
@@ -237,8 +237,8 @@ struct PromptsView: View {
         }
     }
 
-    // MARK: - Recording Area
-    private var recordingArea: some View {
+    // MARK: - Input Area (Recording + Text)
+    private var inputArea: some View {
         VStack(spacing: 12) {
             Button {
                 HapticService.impact(.medium)
@@ -290,47 +290,37 @@ struct PromptsView: View {
                     .disabled(isEnhancing)
                 }
             }
-        }
-    }
 
-    // MARK: - Transcription Area
-    private var transcriptionArea: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Your idea")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-
-            Text(rawTranscription)
-                .font(.subheadline)
-
-            HStack(spacing: 12) {
-                Button {
-                    HapticService.impact(.light)
-                    enhancePrompt()
-                } label: {
-                    HStack(spacing: 4) {
-                        if isEnhancing {
-                            ProgressView()
-                                .tint(Color.bitcoinOrange)
-                                .scaleEffect(0.8)
+            if !rawTranscription.isEmpty {
+                HStack(spacing: 12) {
+                    Button {
+                        HapticService.impact(.light)
+                        enhancePrompt()
+                    } label: {
+                        HStack(spacing: 4) {
+                            if isEnhancing {
+                                ProgressView()
+                                    .tint(Color.bitcoinOrange)
+                                    .scaleEffect(0.8)
+                            }
+                            Text(isEnhancing ? "Enhancing..." : enhancedPrompt.isEmpty ? "Enhance" : "Re-enhance")
+                                .font(.subheadline.weight(.medium))
                         }
-                        Text(isEnhancing ? "Enhancing..." : enhancedPrompt.isEmpty ? "Enhance" : "Re-enhance")
-                            .font(.subheadline.weight(.medium))
                     }
-                }
-                .buttonStyle(.bordered)
-                .tint(.bitcoinOrange)
-                .disabled(isEnhancing)
+                    .buttonStyle(.bordered)
+                    .tint(.bitcoinOrange)
+                    .disabled(isEnhancing)
 
-                Button {
-                    rawTranscription = ""
-                    enhancedPrompt = ""
-                } label: {
-                    Text("Clear")
-                        .font(.subheadline)
+                    Button {
+                        rawTranscription = ""
+                        enhancedPrompt = ""
+                    } label: {
+                        Text("Clear")
+                            .font(.subheadline)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.secondary)
                 }
-                .buttonStyle(.bordered)
-                .tint(.secondary)
             }
         }
     }
@@ -389,6 +379,55 @@ struct PromptsView: View {
                 }
                 .buttonStyle(.bordered)
                 .tint(.secondary)
+            }
+            
+            // Generate Image button
+            Button {
+                HapticService.impact(.medium)
+                generateImage(from: enhancedPrompt)
+            } label: {
+                HStack(spacing: 6) {
+                    if isGeneratingImage {
+                        ProgressView()
+                            .tint(.white)
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "photo.badge.plus")
+                    }
+                    Text(isGeneratingImage ? "Generating..." : "Generate Image")
+                        .font(.subheadline.weight(.medium))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(Color.bitcoinOrange)
+                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .buttonStyle(.borderless)
+            .disabled(isGeneratingImage)
+            
+            if let image = generatedImage {
+                VStack(spacing: 8) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    
+                    Button {
+                        HapticService.impact(.light)
+                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                        withAnimation { showCopyToast = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            withAnimation { showCopyToast = false }
+                        }
+                    } label: {
+                        Label("Save to Photos", systemImage: "square.and.arrow.down")
+                            .font(.subheadline.weight(.medium))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.bitcoinOrange)
+                }
             }
         }
     }
@@ -527,10 +566,34 @@ struct PromptsView: View {
         showCreator = false
     }
 
+    private func generateImage(from prompt: String) {
+        isGeneratingImage = true
+        generatedImage = nil
+        Task {
+            do {
+                let image = try await GeminiImageService.shared.generateImage(prompt: prompt)
+                await MainActor.run {
+                    generatedImage = image
+                    isGeneratingImage = false
+                    HapticService.notification(.success)
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = error.localizedDescription
+                    showError = true
+                    isGeneratingImage = false
+                    HapticService.notification(.error)
+                }
+            }
+        }
+    }
+
     private func resetCreator() {
         rawTranscription = ""
         enhancedPrompt = ""
         selectedPreset = .none
+        generatedImage = nil
+        isGeneratingImage = false
     }
 
     private func deleteRecords(offsets: IndexSet, from records: [PromptRecord]) {

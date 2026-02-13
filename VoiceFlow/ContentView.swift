@@ -30,15 +30,15 @@ struct ContentView: View {
                 }
                 .tag(1)
             
-            SummarizeView(sharedText: $sharedTextData, prefilledText: $summarizePrefilledText)
-                .tabItem {
-                    Label("Summarize", systemImage: "doc.text.fill")
-                }
-                .tag(2)
-            
             PromptsView()
                 .tabItem {
                     Label("Prompts", systemImage: "sparkles.rectangle.stack")
+                }
+                .tag(2)
+            
+            SummarizeView(sharedText: $sharedTextData, prefilledText: $summarizePrefilledText)
+                .tabItem {
+                    Label("Summarize", systemImage: "doc.text.fill")
                 }
                 .tag(3)
             

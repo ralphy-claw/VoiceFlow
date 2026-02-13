@@ -42,7 +42,7 @@ struct VoiceFlowApp: App {
                 case "tts":
                     selectedTab = 1
                 case "summarize":
-                    selectedTab = 2
+                    selectedTab = 3
                 default:
                     break
                 }
