@@ -44,6 +44,18 @@ struct SettingsView: View {
                         }
                     }
                     
+                    // Language picker (#26)
+                    NavigationLink {
+                        LanguagePickerView(selectedLanguage: $sttSettings.language)
+                    } label: {
+                        HStack {
+                            Text("Transcription Language")
+                            Spacer()
+                            Text(sttSettings.languageDisplayCode)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    
                     Picker("Summarization Length", selection: $summarizeSettings.length) {
                         ForEach(SummaryLength.allCases, id: \.self) { length in
                             Text(length.rawValue).tag(length)

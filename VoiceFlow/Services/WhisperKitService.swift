@@ -104,7 +104,12 @@ class STTSettings {
         didSet { save() }
     }
     
+    var language: String {
+        didSet { saveLanguage() }
+    }
+    
     private let providerKey = "stt_provider"
+    private let languageKey = "stt_language"
     
     init() {
         if let providerRaw = UserDefaults.standard.string(forKey: providerKey),
@@ -113,9 +118,75 @@ class STTSettings {
         } else {
             self.provider = .cloud
         }
+        self.language = UserDefaults.standard.string(forKey: languageKey) ?? "auto"
     }
     
     private func save() {
         UserDefaults.standard.set(provider.rawValue, forKey: providerKey)
     }
+    
+    private func saveLanguage() {
+        UserDefaults.standard.set(language, forKey: languageKey)
+    }
+    
+    /// Display code for the current language (e.g. "EN", "BG", "AUTO")
+    var languageDisplayCode: String {
+        if language == "auto" { return "AUTO" }
+        return language.uppercased()
+    }
+}
+
+// MARK: - Supported Languages
+
+struct WhisperLanguage: Identifiable, Hashable {
+    let id: String // ISO code
+    let name: String
+    
+    var displayCode: String { id.uppercased() }
+}
+
+enum WhisperLanguages {
+    static let common: [WhisperLanguage] = [
+        WhisperLanguage(id: "en", name: "English"),
+        WhisperLanguage(id: "bg", name: "Bulgarian"),
+        WhisperLanguage(id: "es", name: "Spanish"),
+        WhisperLanguage(id: "fr", name: "French"),
+        WhisperLanguage(id: "de", name: "German"),
+        WhisperLanguage(id: "ja", name: "Japanese"),
+        WhisperLanguage(id: "zh", name: "Chinese"),
+    ]
+    
+    static let all: [WhisperLanguage] = [
+        WhisperLanguage(id: "en", name: "English"),
+        WhisperLanguage(id: "bg", name: "Bulgarian"),
+        WhisperLanguage(id: "es", name: "Spanish"),
+        WhisperLanguage(id: "fr", name: "French"),
+        WhisperLanguage(id: "de", name: "German"),
+        WhisperLanguage(id: "ja", name: "Japanese"),
+        WhisperLanguage(id: "zh", name: "Chinese"),
+        WhisperLanguage(id: "ar", name: "Arabic"),
+        WhisperLanguage(id: "cs", name: "Czech"),
+        WhisperLanguage(id: "da", name: "Danish"),
+        WhisperLanguage(id: "nl", name: "Dutch"),
+        WhisperLanguage(id: "fi", name: "Finnish"),
+        WhisperLanguage(id: "el", name: "Greek"),
+        WhisperLanguage(id: "he", name: "Hebrew"),
+        WhisperLanguage(id: "hi", name: "Hindi"),
+        WhisperLanguage(id: "hu", name: "Hungarian"),
+        WhisperLanguage(id: "id", name: "Indonesian"),
+        WhisperLanguage(id: "it", name: "Italian"),
+        WhisperLanguage(id: "ko", name: "Korean"),
+        WhisperLanguage(id: "ms", name: "Malay"),
+        WhisperLanguage(id: "no", name: "Norwegian"),
+        WhisperLanguage(id: "pl", name: "Polish"),
+        WhisperLanguage(id: "pt", name: "Portuguese"),
+        WhisperLanguage(id: "ro", name: "Romanian"),
+        WhisperLanguage(id: "ru", name: "Russian"),
+        WhisperLanguage(id: "sk", name: "Slovak"),
+        WhisperLanguage(id: "sv", name: "Swedish"),
+        WhisperLanguage(id: "th", name: "Thai"),
+        WhisperLanguage(id: "tr", name: "Turkish"),
+        WhisperLanguage(id: "uk", name: "Ukrainian"),
+        WhisperLanguage(id: "vi", name: "Vietnamese"),
+    ]
 }

@@ -8,12 +8,20 @@ final class TranscriptionRecord {
     var sourceType: String
     var transcribedText: String
     var duration: Double?
+    var editedText: String?
+    var language: String?
 
-    init(sourceType: String, transcribedText: String, duration: Double? = nil) {
+    /// Returns edited text if available, otherwise the original transcription
+    var displayText: String {
+        editedText ?? transcribedText
+    }
+
+    init(sourceType: String, transcribedText: String, duration: Double? = nil, language: String? = nil) {
         self.id = UUID()
         self.timestamp = Date()
         self.sourceType = sourceType
         self.transcribedText = transcribedText
         self.duration = duration
+        self.language = language
     }
 }

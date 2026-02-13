@@ -20,7 +20,7 @@ actor OpenAIService {
     private var apiKey: String { Config.openAIAPIKey }
     
     // MARK: - Whisper STT
-    func transcribe(audioData: Data, filename: String = "audio.m4a") async throws -> String {
+    func transcribe(audioData: Data, filename: String = "audio.m4a", language: String? = nil) async throws -> String {
         let boundary = UUID().uuidString
         var request = URLRequest(url: URL(string: Config.whisperEndpoint)!)
         request.httpMethod = "POST"
@@ -30,6 +30,10 @@ actor OpenAIService {
         var body = Data()
         // model field
         body.appendMultipart(boundary: boundary, name: "model", value: Config.whisperModel)
+        // language field (if specified and not "auto")
+        if let language = language, language != "auto", !language.isEmpty {
+            body.appendMultipart(boundary: boundary, name: "language", value: language)
+        }
         // file field
         let mimeType = filename.hasSuffix(".wav") ? "audio/wav" :
                         filename.hasSuffix(".mp3") ? "audio/mpeg" : "audio/m4a"
