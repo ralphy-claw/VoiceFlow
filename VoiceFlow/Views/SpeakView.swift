@@ -150,10 +150,14 @@ struct SpeakView: View {
                         .listRowBackground(Color.darkSurface)
                     } else {
                         ForEach(history) { record in
-                            TTSHistoryRow(record: record, isExpanded: expandedRecordID == record.id)
+                            TTSHistoryRow(record: record, isExpanded: expandedRecordID == record.id) {
+                                UIPasteboard.general.string = record.inputText
+                                HapticService.notification(.success)
+                                withAnimation { showCopyToast = true }
+                            }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    withAnimation {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
                                         expandedRecordID = expandedRecordID == record.id ? nil : record.id
                                     }
                                 }
@@ -289,6 +293,7 @@ struct ShareSheet: UIViewControllerRepresentable {
 private struct TTSHistoryRow: View {
     let record: TTSRecord
     let isExpanded: Bool
+    var onCopy: () -> Void = {}
     @StateObject private var player = AudioPlayer()
     @State private var errorMessage: String?
     
@@ -328,7 +333,7 @@ private struct TTSHistoryRow: View {
                     .buttonStyle(ScaleButtonStyle())
                     
                     Button {
-                        UIPasteboard.general.string = record.inputText
+                        onCopy()
                     } label: {
                         Image(systemName: "doc.on.doc.fill")
                             .font(.title3)
@@ -339,6 +344,11 @@ private struct TTSHistoryRow: View {
             }
         }
         .padding(.vertical, 4)
+        .contextMenu {
+            Button { onCopy() } label: {
+                Label("Copy Text", systemImage: "doc.on.doc")
+            }
+        }
     }
     
     private func replayAudio() {

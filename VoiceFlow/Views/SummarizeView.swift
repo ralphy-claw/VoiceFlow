@@ -179,10 +179,14 @@ struct SummarizeView: View {
                         .listRowBackground(Color.darkSurface)
                     } else {
                         ForEach(history) { record in
-                            SummaryHistoryRow(record: record, isExpanded: expandedRecordID == record.id)
+                            SummaryHistoryRow(record: record, isExpanded: expandedRecordID == record.id) {
+                                UIPasteboard.general.string = record.summaryText
+                                HapticService.notification(.success)
+                                withAnimation { showCopyToast = true }
+                            }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    withAnimation {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
                                         expandedRecordID = expandedRecordID == record.id ? nil : record.id
                                     }
                                 }
@@ -247,11 +251,19 @@ struct SummarizeView: View {
 private struct SummaryHistoryRow: View {
     let record: SummaryRecord
     let isExpanded: Bool
+    var onCopy: () -> Void = {}
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(record.inputText)
-                .lineLimit(isExpanded ? nil : 2)
+            HStack {
+                Text(record.inputText)
+                    .lineLimit(isExpanded ? nil : 2)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .rotationEffect(.degrees(isExpanded ? 90 : 0))
+            }
             
             Text(record.timestamp, style: .relative)
                 .font(.caption2)
@@ -268,6 +280,7 @@ private struct SummaryHistoryRow: View {
                         Spacer()
                         Button {
                             UIPasteboard.general.string = record.inputText
+                            HapticService.notification(.success)
                         } label: {
                             Image(systemName: "doc.on.doc.fill")
                                 .font(.caption)
@@ -287,7 +300,7 @@ private struct SummaryHistoryRow: View {
                             .foregroundStyle(Color.bitcoinOrange)
                         Spacer()
                         Button {
-                            UIPasteboard.general.string = record.summaryText
+                            onCopy()
                         } label: {
                             Image(systemName: "doc.on.doc.fill")
                                 .font(.caption)
@@ -302,6 +315,17 @@ private struct SummaryHistoryRow: View {
             }
         }
         .padding(.vertical, 4)
+        .contextMenu {
+            Button {
+                UIPasteboard.general.string = record.inputText
+                HapticService.notification(.success)
+            } label: {
+                Label("Copy Original", systemImage: "doc.on.doc")
+            }
+            Button { onCopy() } label: {
+                Label("Copy Summary", systemImage: "doc.on.doc.fill")
+            }
+        }
     }
 }
 

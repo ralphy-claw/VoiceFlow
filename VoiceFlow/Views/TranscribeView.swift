@@ -166,10 +166,14 @@ struct TranscribeView: View {
                         .listRowBackground(Color.darkSurface)
                     } else {
                         ForEach(history) { record in
-                            TranscriptionHistoryRow(record: record, isExpanded: expandedRecordID == record.id)
+                            TranscriptionHistoryRow(record: record, isExpanded: expandedRecordID == record.id) {
+                                UIPasteboard.general.string = record.transcribedText
+                                HapticService.notification(.success)
+                                withAnimation { showCopyToast = true }
+                            }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    withAnimation {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
                                         expandedRecordID = expandedRecordID == record.id ? nil : record.id
                                     }
                                 }
@@ -281,6 +285,7 @@ struct TranscribeView: View {
 private struct TranscriptionHistoryRow: View {
     let record: TranscriptionRecord
     let isExpanded: Bool
+    var onCopy: () -> Void = {}
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -291,6 +296,10 @@ private struct TranscriptionHistoryRow: View {
                 Text(record.transcribedText)
                     .lineLimit(isExpanded ? nil : 2)
                 Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .rotationEffect(.degrees(isExpanded ? 90 : 0))
             }
             
             Text(record.timestamp, style: .relative)
@@ -304,7 +313,7 @@ private struct TranscriptionHistoryRow: View {
                     .textSelection(.enabled)
                 
                 Button {
-                    UIPasteboard.general.string = record.transcribedText
+                    onCopy()
                 } label: {
                     Image(systemName: "doc.on.doc.fill")
                         .font(.title3)
@@ -314,6 +323,11 @@ private struct TranscriptionHistoryRow: View {
             }
         }
         .padding(.vertical, 4)
+        .contextMenu {
+            Button { onCopy() } label: {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+        }
     }
 }
 
