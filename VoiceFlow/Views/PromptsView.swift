@@ -343,7 +343,7 @@ struct PromptsView: View {
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                 Spacer()
-                if let preset = selectedPreset.modifier {
+                if selectedPreset.modifier != nil {
                     Text(selectedPreset.rawValue)
                         .font(.caption2)
                         .padding(.horizontal, 6)
