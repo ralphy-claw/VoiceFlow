@@ -39,7 +39,7 @@ class ShareViewController: UIViewController {
             return
         }
         
-        updateStatus("Processing audio file...")
+        updateStatus("Processing audio file...", isError: false)
         
         let audioTypes = [
             UTType.audio.identifier,
