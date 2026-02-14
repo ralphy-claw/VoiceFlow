@@ -8,7 +8,6 @@ struct SettingsView: View {
     @State private var summarizeSettings = SummarizeSettings()
     @State private var showKeyboardSetup = false
     @Environment(ThemeManager.self) private var theme
-    @State private var geminiAPIKey = ""
     
     var body: some View {
         NavigationStack {
@@ -100,26 +99,6 @@ struct SettingsView: View {
                         .foregroundColor(.bitcoinOrange)
                 }
                 
-                // MARK: - Gemini API
-                Section {
-                    HStack {
-                        SecureField("Enter Gemini API Key", text: $geminiAPIKey)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .font(.system(.body, design: .monospaced))
-                            .onAppear { geminiAPIKey = KeychainService.read(key: "geminiAPIKey") ?? "" }
-                            .onChange(of: geminiAPIKey) { _, newValue in
-                                try? KeychainService.save(key: "geminiAPIKey", value: newValue)
-                            }
-                    }
-                    .listRowBackground(Color.darkSurface)
-                } header: {
-                    Label("Gemini (Image Gen)", systemImage: "photo.badge.plus")
-                        .foregroundColor(.bitcoinOrange)
-                } footer: {
-                    Text("Used for AI image generation in the Prompts tab.")
-                        .foregroundColor(.gray)
-                }
                 
                 // MARK: - Provider Preferences
                 Section {

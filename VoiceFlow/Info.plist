@@ -46,8 +46,6 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>VoiceFlow needs access to save generated images to your photo library.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>VoiceFlow needs microphone access to record audio for transcription.</string>
 	<key>UIApplicationSceneManifest</key>
