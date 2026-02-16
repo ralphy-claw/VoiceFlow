@@ -18,8 +18,7 @@ struct SpeakView: View {
     @State private var errorMessage: String?
     @State private var showError = false
     @State private var expandedRecordID: UUID?
-    @State private var showShareSheet = false
-    @State private var shareURL: URL?
+    @State private var shareURL: IdentifiableURL?
     @State private var showCopyToast = false
     @State private var showPlaybackBar = false
     @StateObject private var playbackVM = AudioPlaybackViewModel()
@@ -206,10 +205,8 @@ struct SpeakView: View {
                     prefilledText = ""
                 }
             }
-            .sheet(isPresented: $showShareSheet) {
-                if let url = shareURL {
-                    ShareSheet(activityItems: [url])
-                }
+            .sheet(item: $shareURL) { item in
+                ShareSheet(activityItems: [item.url])
             }
         }
     }
@@ -294,13 +291,19 @@ struct SpeakView: View {
         do {
             try? FileManager.default.removeItem(at: tempURL)
             try data.write(to: tempURL)
-            shareURL = tempURL
-            showShareSheet = true
+            shareURL = IdentifiableURL(url: tempURL)
         } catch {
             errorMessage = "Failed to prepare audio for export"
             showError = true
         }
     }
+}
+
+// MARK: - Identifiable URL
+
+struct IdentifiableURL: Identifiable {
+    let id = UUID()
+    let url: URL
 }
 
 // MARK: - Share Sheet
@@ -323,8 +326,7 @@ private struct TTSHistoryRow: View {
     var onCopy: () -> Void = {}
     @StateObject private var player = AudioPlayer()
     @State private var errorMessage: String?
-    @State private var showShareSheet = false
-    @State private var shareURL: URL?
+    @State private var shareURL: IdentifiableURL?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -390,10 +392,8 @@ private struct TTSHistoryRow: View {
                 Label("Share Audio", systemImage: "square.and.arrow.up")
             }
         }
-        .sheet(isPresented: $showShareSheet) {
-            if let url = shareURL {
-                ShareSheet(activityItems: [url])
-            }
+        .sheet(item: $shareURL) { item in
+            ShareSheet(activityItems: [item.url])
         }
     }
     
@@ -421,8 +421,7 @@ private struct TTSHistoryRow: View {
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("voiceflow_\(record.id).mp3")
         try? FileManager.default.removeItem(at: tempURL)
         try? FileManager.default.copyItem(at: fileURL, to: tempURL)
-        shareURL = tempURL
-        showShareSheet = true
+        shareURL = IdentifiableURL(url: tempURL)
     }
 }
 
