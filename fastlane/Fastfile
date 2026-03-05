@@ -71,6 +71,14 @@ platform :ios do
       distribute_external: false
     )
 
+    # Bump commit and push
+    marketing_version = get_version_number(xcodeproj: "VoiceFlow.xcodeproj", target: "VoiceFlow")
+    xcconfig_path = File.join(Dir.pwd, "..", "Configurations", "Base", "Base.xcconfig")
+    sh("git add '#{xcconfig_path}'")
+    sh("git add '../VoiceFlow.xcodeproj/project.pbxproj'")
+    sh("git commit -m 'Version Bump: v#{marketing_version}(#{build_number})' --allow-empty")
+    sh("git push origin HEAD")
+
     UI.success("✅ VoiceFlow build #{build_number} uploaded to TestFlight!")
   end
 
