@@ -4,3 +4,7 @@
 DerivedData/
 build/
 .DS_Store
+
+# Fastlane secrets
+fastlane/.env
+fastlane/.env.*
